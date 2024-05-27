@@ -10,7 +10,6 @@ import ru.practicum.shareit.user.User;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Component
 @Data
@@ -47,12 +46,10 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User get(Long id) {
-        for (User user : users) {
-            if (user.getId() == id) {
-                return user;
-            }
-        }
-        return null;
+        return users.stream()
+                .filter(user -> user.getId() == id)
+                .findFirst()
+                .orElseGet(null);
     }
 
     @Override
@@ -71,12 +68,10 @@ public class UserRepositoryImpl implements UserRepository {
 
     @SneakyThrows
     private User userNotFound(Long id) {
-        for (User user : users) {
-            if (Objects.equals(user.getId(), id)) {
-                return user;
-            }
-        }
-        throw new EntityNotFoundException("user c id " + id + " не найден");
+        return users.stream()
+                .filter(user -> user.getId() == id)
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("user c id " + id + " не найден"));
     }
 
     private void fillFields(User user, User userNew) {

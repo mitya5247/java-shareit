@@ -7,11 +7,11 @@ import ru.practicum.shareit.exceptions.EntityNotFoundException;
 import ru.practicum.shareit.item.Mapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class ItemRepositoryImpl implements ItemRepository {
@@ -46,52 +46,45 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public ItemDto get(Long id) {
-        for (Item item : items) {
-            if (item.getId() == id) {
-                ItemDto itemDto = Mapper.convertToDto(item);
-                return itemDto;
-            }
-        }
-        return null;
+        return items.stream()
+                .filter(item -> item.getId() == id)
+                .findFirst()
+                .map(Mapper::convertToDto)
+                .orElse(null);
     }
 
     @Override
     public List<ItemDto> getAll(Long userId) {
-        List<ItemDto> itemsDto = new ArrayList<>();
-        for (Item item : items) {
-            if (item.getOwner() == userId) {
-                ItemDto itemDto = Mapper.convertToDto(item);
-                itemsDto.add(itemDto);
-            }
-        }
-        return itemsDto;
+       return items.stream()
+                .filter(item -> item.getOwner() == userId)
+                .map(Mapper::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<ItemDto> search(String word) {
-        List<ItemDto> listBySearch = new ArrayList<>();
         if (!word.isBlank()) {
-            String wordLow = word.toLowerCase();
-            for (Item item : items) {
-                String lowName = item.getName().toLowerCase();
-                String lowDesc = item.getDescription().toLowerCase();
-                if (lowName.contains(wordLow) || lowDesc.contains(wordLow) && item.isAvailable()) {
-                    ItemDto itemDto = Mapper.convertToDto(item);
-                    listBySearch.add(itemDto);
-                }
-            }
+            return items.stream()
+                    .filter(item -> {
+                                String wordLow = word.toLowerCase();
+                                    return item.getName().toLowerCase().contains(wordLow) ||
+                                            item.getDescription().toLowerCase().contains(wordLow)
+                                            && item.isAvailable();
+                                    }
+                            )
+                    .map(Mapper::convertToDto)
+                    .collect(Collectors.toList());
+        } else {
+            return new ArrayList<>();
         }
-        return listBySearch;
     }
 
     @SneakyThrows
     private Item itemNotFound(Long itemId) {
-        for (Item item : items) {
-            if (item.getId() == itemId) {
-                return item;
-            }
-        }
-        throw new EntityNotFoundException("item c id " + itemId + " не найден");
+        return items.stream()
+                .filter(item -> item.getId() == itemId)
+                .findFirst()
+                .orElseThrow(() ->new EntityNotFoundException("item c id " + itemId + " не найден"));
     }
 
     @SneakyThrows
@@ -114,11 +107,10 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @SneakyThrows
     private void checkExistUser(Long id) {
-        for (User user : repository.getAll()) {
-            if (user.getId() == id) {
-                return;
-            }
-        }
-        throw new EntityNotFoundException("user c id " + id + " не сущуствует");
+        this.repository.getAll().stream()
+                .filter(user -> user.getId() == id)
+                .findFirst()
+                .orElseThrow(() -> new EntityNotFoundException("user c id " + id + " не сущуствует"));
+
     }
 }
