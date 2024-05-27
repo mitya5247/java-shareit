@@ -10,6 +10,7 @@ import ru.practicum.shareit.user.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 @Data
@@ -40,13 +41,13 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void delete(Long id) {
         this.userNotFound(id);
-        users.removeIf(user -> user.getId() == id);
+        users.removeIf(user -> Objects.equals(user.getId(), id));
     }
 
     @Override
     public User get(Long id) {
         return users.stream()
-                .filter(user -> user.getId() == id)
+                .filter(user -> Objects.equals(user.getId(), id))
                 .findFirst()
                 .orElseGet(null);
     }
@@ -68,7 +69,7 @@ public class UserRepositoryImpl implements UserRepository {
     @SneakyThrows
     private User userNotFound(Long id) {
         return users.stream()
-                .filter(user -> user.getId() == id)
+                .filter(user -> Objects.equals(user.getId(), id))
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("user c id " + id + " не найден"));
     }

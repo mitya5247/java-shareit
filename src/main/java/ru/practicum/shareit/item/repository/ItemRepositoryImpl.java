@@ -11,6 +11,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
@@ -56,7 +57,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     @Override
     public List<ItemDto> getAll(Long userId) {
         return items.stream()
-                .filter(item -> item.getOwner() == userId)
+                .filter(item -> Objects.equals(item.getOwner(), userId))
                 .map(Mapper::convertToDto)
                 .collect(Collectors.toList());
     }
@@ -82,14 +83,14 @@ public class ItemRepositoryImpl implements ItemRepository {
     @SneakyThrows
     private Item itemNotFound(Long itemId) {
         return items.stream()
-                .filter(item -> item.getId() == itemId)
+                .filter(item -> Objects.equals(item.getId(), itemId))
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("item c id " + itemId + " не найден"));
     }
 
     @SneakyThrows
     private void fillFields(Long userId, Item item, ItemDto itemDto) {
-        if (item.getOwner() == userId) {
+        if (Objects.equals(item.getOwner(), userId)) {
             if (itemDto.getName() != null) {
                 item.setName(itemDto.getName());
             }
