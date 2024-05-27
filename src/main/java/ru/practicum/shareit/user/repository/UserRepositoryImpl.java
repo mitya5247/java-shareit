@@ -25,7 +25,6 @@ public class UserRepositoryImpl implements UserRepository {
         idGen++;
         users.add(user);
         return user;
-
     }
 
     @Override

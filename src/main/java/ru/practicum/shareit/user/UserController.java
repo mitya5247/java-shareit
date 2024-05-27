@@ -22,18 +22,22 @@ public class UserController {
     public User create(@Valid @RequestBody User user) throws EmailAlreadyExistsException {
         return service.create(user);
     }
+
     @PatchMapping("/{userId}")
-    public User update(@PathVariable Long userId , @RequestBody User user)  {
+    public User update(@PathVariable Long userId, @RequestBody User user) {
         return service.update(userId, user);
     }
+
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         service.delete(id);
     }
+
     @GetMapping("/{id}")
     public User get(@PathVariable Long id) {
         return service.get(id);
     }
+
     @GetMapping
     public List<User> getAll() {
         return service.getAll();

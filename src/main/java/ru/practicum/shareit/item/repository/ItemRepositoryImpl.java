@@ -55,7 +55,7 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public List<ItemDto> getAll(Long userId) {
-       return items.stream()
+        return items.stream()
                 .filter(item -> item.getOwner() == userId)
                 .map(Mapper::convertToDto)
                 .collect(Collectors.toList());
@@ -67,11 +67,11 @@ public class ItemRepositoryImpl implements ItemRepository {
             return items.stream()
                     .filter(item -> {
                                 String wordLow = word.toLowerCase();
-                                    return item.getName().toLowerCase().contains(wordLow) ||
-                                            item.getDescription().toLowerCase().contains(wordLow)
-                                            && item.isAvailable();
-                                    }
-                            )
+                                return item.getName().toLowerCase().contains(wordLow) ||
+                                        item.getDescription().toLowerCase().contains(wordLow)
+                                                && item.isAvailable();
+                            }
+                    )
                     .map(Mapper::convertToDto)
                     .collect(Collectors.toList());
         } else {
@@ -84,7 +84,7 @@ public class ItemRepositoryImpl implements ItemRepository {
         return items.stream()
                 .filter(item -> item.getId() == itemId)
                 .findFirst()
-                .orElseThrow(() ->new EntityNotFoundException("item c id " + itemId + " не найден"));
+                .orElseThrow(() -> new EntityNotFoundException("item c id " + itemId + " не найден"));
     }
 
     @SneakyThrows
