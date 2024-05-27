@@ -48,7 +48,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     @Override
     public ItemDto get(Long id) {
         return items.stream()
-                .filter(item -> item.getId() == id)
+                .filter(item -> Objects.equals(item.getId(), id))
                 .findFirst()
                 .map(Mapper::convertToDto)
                 .orElse(null);
@@ -109,7 +109,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     @SneakyThrows
     private void checkExistUser(Long id) {
         this.repository.getAll().stream()
-                .filter(user -> user.getId() == id)
+                .filter(user -> Objects.equals(user.getId(), id))
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("user c id " + id + " не сущуствует"));
 
