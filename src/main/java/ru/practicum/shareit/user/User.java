@@ -21,7 +21,7 @@ public class User {
     @Positive(message = "id must be positive")
     Long id;
     @Email
-    @NotNull
+    @NotNull(message = "email must not be null")
     String email;
     String name;
 }

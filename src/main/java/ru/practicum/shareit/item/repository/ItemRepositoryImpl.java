@@ -1,6 +1,9 @@
 package ru.practicum.shareit.item.repository;
 
+import lombok.AccessLevel;
 import lombok.SneakyThrows;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exceptions.EntityNotFoundException;
@@ -15,9 +18,11 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Slf4j
 public class ItemRepositoryImpl implements ItemRepository {
 
-    private final UserRepository repository;
+    UserRepository repository;
     List<Item> items = new ArrayList<>();
     long idGen = 1;
 
@@ -33,6 +38,7 @@ public class ItemRepositoryImpl implements ItemRepository {
         idGen++;
         Item item = Mapper.convertToItem(userId, itemDto);
         items.add(item);
+        log.info("добавлен элемент с id " + item.getId() + " пользователем с id " + userId);
         return itemDto;
     }
 
@@ -42,6 +48,7 @@ public class ItemRepositoryImpl implements ItemRepository {
         Item item = this.itemNotFound(itemId);
         this.fillFields(userId, item, itemDto);
         ItemDto itemDtoNew = Mapper.convertToDto(item);
+        log.info("обновлен элемент с id " + item.getId() + " пользователем с id " + userId);
         return itemDtoNew;
     }
 

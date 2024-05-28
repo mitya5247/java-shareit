@@ -20,10 +20,8 @@ import javax.validation.constraints.Positive;
 public class ItemDto {
     @Positive
     Long id;
-    @NotNull(message = "name must not be null")
     @NotEmpty(message = "name must not be empty")
     String name;
-    @NotNull(message = "description must not be null")
     @NotEmpty(message = "description must not be empty")
     String description;
     @NotNull(message = "available must not be null")

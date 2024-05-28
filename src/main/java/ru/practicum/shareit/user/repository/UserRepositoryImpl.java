@@ -1,8 +1,11 @@
 package ru.practicum.shareit.user.repository;
 
 
+import lombok.AccessLevel;
 import lombok.Data;
 import lombok.SneakyThrows;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exceptions.EmailAlreadyExistsException;
 import ru.practicum.shareit.exceptions.EntityNotFoundException;
@@ -14,6 +17,8 @@ import java.util.Objects;
 
 @Component
 @Data
+@Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserRepositoryImpl implements UserRepository {
 
     List<User> users = new ArrayList<>();
@@ -25,6 +30,7 @@ public class UserRepositoryImpl implements UserRepository {
         user.setId(idGen);
         idGen++;
         users.add(user);
+        log.info("создан пользователь с id " + user.getId());
         return user;
     }
 
@@ -35,6 +41,7 @@ public class UserRepositoryImpl implements UserRepository {
             this.checkEmailOnDuplicate(userNew.getEmail());
         }
         this.fillFields(user, userNew);
+        log.info("обновлен пользователь с id " + user.getId());
         return user;
     }
 
@@ -42,6 +49,7 @@ public class UserRepositoryImpl implements UserRepository {
     public void delete(Long id) {
         this.userNotFound(id);
         users.removeIf(user -> Objects.equals(user.getId(), id));
+        log.info("удален пользователь с id " + id);
     }
 
     @Override
