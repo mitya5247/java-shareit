@@ -25,18 +25,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User user) throws EmailAlreadyExistsException {
-        this.checkEmailOnDuplicate(user.getEmail());
+   //     this.checkEmailOnDuplicate(user.getEmail());
         List<User> users = this.getAll();
-        log.info("создан пользователь с id " + user.getId());
         return repository.save(user);
     }
 
     @Override
     public User update(Long userId, User user) {
         User user1 = this.userNotFound(userId);
-        if (!user1.getEmail().equals(user.getEmail())) {
-            this.checkEmailOnDuplicate(user.getEmail());
-        }
+    //    if (!user1.getEmail().equals(user.getEmail())) {
+    //        this.checkEmailOnDuplicate(user.getEmail());
+     //   }
         this.fillFields(user1, user);
         repository.save(user1);
         log.info("обновлен пользователь с id " + user.getId());
@@ -52,7 +51,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User get(Long id) {
-        return repository.findById(id).orElseGet(null);
+        return this.userNotFound(id);
     }
 
     @Transactional

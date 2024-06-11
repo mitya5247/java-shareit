@@ -2,6 +2,7 @@ package ru.practicum.shareit.user;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -28,7 +29,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     Long id;
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     @Email
     @NotNull(message = "email must not be null")
     String email;

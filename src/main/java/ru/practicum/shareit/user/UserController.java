@@ -16,10 +16,10 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserController {
 
-    UserService service;
+    final UserService service;
 
     @PostMapping
     public User create(@Valid @RequestBody User user) throws EmailAlreadyExistsException {
