@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.repository;
+/* package ru.practicum.shareit.item.repository;
 
 import lombok.AccessLevel;
 import lombok.SneakyThrows;
@@ -122,3 +122,5 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     }
 }
+
+ */

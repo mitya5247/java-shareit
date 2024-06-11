@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user.repository;
+/* package ru.practicum.shareit.user.repository;
 
 
 import lombok.AccessLevel;
@@ -91,3 +91,6 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 }
+
+
+ */
