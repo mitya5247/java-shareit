@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.Constants;
 import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import java.util.List;
@@ -22,8 +23,8 @@ public class BookingController {
     BookingService service;
 
     @PostMapping
-    public Booking createRequest(@RequestHeader(Constants.HEADER) Long userId, @RequestBody Booking booking) {
-        return service.createRequest(userId, booking);
+    public Booking createRequest(@RequestHeader(Constants.HEADER) Long userId, @RequestBody BookingDto bookingDto) {
+        return service.createRequest(userId, bookingDto);
     }
 
     @PatchMapping("/{bookingId}")

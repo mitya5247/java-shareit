@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    List<Booking> findAllByStateAndBookerOrderByStartDesc(String state, Long userId);
+    List<Booking> findAllByStatusAndBookerOrderByStartDesc(String state, Long userId);
 
  //   List<Booking> findAllByOwnerAndStateOrderByDesc(String state, Long userId);
 

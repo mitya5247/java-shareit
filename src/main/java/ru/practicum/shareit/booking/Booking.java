@@ -5,9 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
 import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  * TODO Sprint add-bookings.
@@ -22,14 +25,16 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    @Column(name = "booker_id")
-    Long booker;
-    @Column(name = "item_id")
-    Long itemId;
-    @Column(name = "state")
-    State state = State.WAITING;
+    @ManyToOne
+    @JoinColumn(name = "booker_id", referencedColumnName = "id")
+    User booker;
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    Item item;
+    @Column(name = "status")
+    State status = State.WAITING;
     @Column(name = "start_time")
-    Date start;
+    Timestamp start;
     @Column(name = "end_time")
-    Date end;
+    Timestamp end;
 }

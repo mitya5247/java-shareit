@@ -2,12 +2,13 @@ package ru.practicum.shareit.booking.service;
 
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.dto.BookingDto;
 
 import java.util.List;
 
 public interface BookingService {
 
-    Booking createRequest(Long userId, Booking booking);
+    Booking createRequest(Long userId, BookingDto booking);
 
     Booking updateState(Long userId, Long bookingId, String state); // подтверждение запроса на бронирование
 
