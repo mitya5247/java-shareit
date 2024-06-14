@@ -5,9 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.shareit.exceptions.EmailAlreadyExistsException;
-import ru.practicum.shareit.exceptions.EntityNotFoundException;
-import ru.practicum.shareit.exceptions.ItemIsUnAvailable;
+import ru.practicum.shareit.exceptions.*;
 
 @Slf4j
 @RestControllerAdvice
@@ -34,4 +32,24 @@ public class ErrorHandler {
         return new ErrorResponse(exception.getMessage());
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleDtoNotValid(final BookingDtoIsNotValid exception) {
+        log.info(exception.getMessage());
+        return new ErrorResponse(exception.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleItemNotFound(final ItemNotFound exception) {
+        log.info(exception.getMessage());
+        return new ErrorResponse(exception.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleItemNotFound(final BadState exception) {
+        log.info(exception.getMessage());
+        return new ErrorResponse(exception.getMessage());
+    }
 }

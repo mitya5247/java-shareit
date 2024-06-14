@@ -19,6 +19,6 @@ create table if not exists bookings (
     booker_id bigint not null references users(id),
     item_id bigint not null references items(id),
     status varchar(20) not null,
-    start_time date,
-    end_time date
+    start_time timestamp without time zone,
+    end_time timestamp without time zone
 );

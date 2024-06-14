@@ -11,6 +11,7 @@ import ru.practicum.shareit.user.User;
 import javax.persistence.*;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /**
  * TODO Sprint add-bookings.
@@ -32,9 +33,10 @@ public class Booking {
     @JoinColumn(name = "item_id")
     Item item;
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     State status = State.WAITING;
     @Column(name = "start_time")
-    Timestamp start;
+    LocalDateTime start;
     @Column(name = "end_time")
-    Timestamp end;
+    LocalDateTime end;
 }
