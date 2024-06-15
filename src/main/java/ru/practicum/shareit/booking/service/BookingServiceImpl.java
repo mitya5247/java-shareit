@@ -145,8 +145,8 @@ public class BookingServiceImpl implements BookingService {
             state = State.ALL;
         }
         switch (state) {
-            case CURRENT: return bookingRepository.findAllByBookerAndAndEndBeforeOrderByStartDesc(user,
-                    LocalDateTime.now());
+            case CURRENT: return bookingRepository.findAllByBookerAndStartBeforeAndEndAfterOrderByStartAsc(user,
+                    LocalDateTime.now(), LocalDateTime.now());
             case FUTURE: return bookingRepository.findAllByBookerAndEndAfterOrderByStartDesc(user, LocalDateTime.now());
             case PAST: return bookingRepository.findAllByBookerAndEndBeforeOrderByStartDesc(user, LocalDateTime.now());
             case APPROVED: return bookingRepository.findAllByStatusAndBookerOrderByStartDesc(State.APPROVED, user);
@@ -159,8 +159,8 @@ public class BookingServiceImpl implements BookingService {
 
     private List<Booking> chooseRequestForOwner(List<Item> items, State state) throws BadState {
         switch (state) {
-            case CURRENT: return bookingRepository.findAllByItemInAndEndBeforeOrderByStartDesc(items,
-                    LocalDateTime.now());
+            case CURRENT: return bookingRepository.findAllByItemInAndStartBeforeAndEndAfterOrderByStartDesc(items,
+                    LocalDateTime.now(), LocalDateTime.now());
             case FUTURE: return bookingRepository.findAllByItemInAndEndAfterOrderByStartDesc(items, LocalDateTime.now());
             case PAST: return bookingRepository.findAllByItemInAndEndBeforeOrderByStartDesc(items, LocalDateTime.now());
             case APPROVED: return bookingRepository.findAllByStatusAndItemInOrderByStartDesc(State.APPROVED, items);
