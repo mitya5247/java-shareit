@@ -6,6 +6,9 @@ import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.State;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.BadComment;
 import ru.practicum.shareit.exceptions.EntityNotFoundException;
 import ru.practicum.shareit.item.Mapper;
@@ -35,6 +38,8 @@ public class ItemServiceImpl implements ItemService {
     UserRepository userRepository;
     @Autowired
     CommentRepository commentRepository;
+    @Autowired
+    BookingRepository bookingRepository;
 
     @Override
     public ItemDto add(Long userId, ItemDto itemDto) {
@@ -62,6 +67,7 @@ public class ItemServiceImpl implements ItemService {
  //       if (item.getNextBooking() != null && item.getNextBooking().getEnd().isBefore(LocalDateTime.now())) {
  //           item.setLastBooking(item.getNextBooking());
  //       }
+        this.synchronizeBooking(item);
         ItemDto itemDto = Mapper.convertToDto(item);
         if (!userId.equals(item.getOwner())) {
             itemDto.setLastBooking(null);
@@ -74,6 +80,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> getAll(Long userId) {
         List<Item> items = repository.findAllByOwnerOrderById(userId);
         List<ItemDto> itemDtos = items.stream()
+                .map(this::synchronizeBooking)
                 .map(Mapper::convertToDto)
                 .collect(Collectors.toList());
         return itemDtos;
@@ -98,10 +105,18 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemNotFound(itemId);
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException("user c id " + userId + " не сущуствует"));
-        if (item.getLastBooking().getStart().isAfter(LocalDateTime.now())) {
-            throw new BadComment("нельзя добавить комментарий о бронировании в будущем");
+  //      if (item.getLastBooking().getStart().isAfter(LocalDateTime.now())) {
+   //         throw new BadComment("нельзя добавить комментарий о бронировании в будущем");
+    //    }
+        Booking booking = bookingRepository.findFirstByBookerAndItemOrderByStart(user, item);
+        LocalDateTime now = LocalDateTime.now();
+        if (booking == null) {
+            throw new BadComment("нельзя дать отзыв, если не брал данный товар");
         }
-        if (item.getLastBooking().getBooker().getId().equals(userId)) {
+        if (booking.getStart().isAfter(now.plusSeconds(1))) {
+            throw new BadComment("нельзя дать отзыв на будущую аренду");
+        }
+        if (booking.getStatus().equals(State.APPROVED)) {
             comment.setUser(user);
             comment.setCreated(LocalDateTime.now());
         }
@@ -144,6 +159,18 @@ public class ItemServiceImpl implements ItemService {
             throw new EntityNotFoundException("user c id " + userId + " не совпадает с создателем item id " +
                     item.getId());
         }
+    }
+
+    private Item synchronizeBooking(Item item) {
+        LocalDateTime now = LocalDateTime.now();
+        Booking nextBooking = bookingRepository.findFirstByItemAndStartBetweenOrderByStartDesc(item, now, now.plusHours(1));
+        if (nextBooking != null) {
+            Booking lastBooking = bookingRepository.findFirstByItemAndStartBetweenOrderByStartDesc(item, now.minusHours(1),
+                    nextBooking.getStart().minusSeconds(1));
+            item.setLastBooking(lastBooking);
+        }
+        item.setNextBooking(nextBooking);
+        return item;
     }
 
 }

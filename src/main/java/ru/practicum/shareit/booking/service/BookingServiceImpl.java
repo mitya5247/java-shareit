@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
+import net.bytebuddy.asm.Advice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -22,12 +23,8 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import javax.persistence.EntityNotFoundException;
-import java.awt.print.Book;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -77,7 +74,7 @@ public class BookingServiceImpl implements BookingService {
         switch (state) {
             case "true": booking.setStatus(State.APPROVED); // возможно применить break;
                 bookingRepository.save(booking); // поменять статус вещи на занято после статуса
-                this.setNextBooking(item, booking);
+                // this.setNextBooking(item, booking);
                 itemRepository.save(item);
                 List<Item> items = itemRepository.findAll();
                 return Mapper.convertToBookingDtoResponse(booking);
@@ -192,15 +189,32 @@ public class BookingServiceImpl implements BookingService {
             item.setLastBooking(booking);
             return item;
         }
-        this.synchronizeTime(item);
-        if (item.getNextBooking().equals(item.getLastBooking())) {
-            item.setNextBooking(booking);
-            return item;
-        } else {
-            return item;
-        }
-   //     item.setLastBooking(item.getNextBooking());
-    //    item.setNextBooking(booking);
+   //     List<Booking> bookings = bookingRepository.findAllByItemAndStatus(item, State.FUTURE);
+      //  if (!bookings.isEmpty()) {
+   //     bookings = bookings.stream()
+    //            .sorted(Comparator.comparing(Booking::getStart))
+    //            .collect(Collectors.toList());
+    //        item.setLastBooking(bookings.get(0));
+    //        if (bookings.size() > 1) {
+   //             item.setNextBooking(bookings.get(1));
+     //       }
+     //   }
+        LocalDateTime now = LocalDateTime.now();
+     //   Booking bookingLast = bookingRepository.findByItemAndStartBetween(item, now.minusHours(24), now.plusHours(12));
+     //   Booking bookingNext = bookingRepository.findByItemAndStartBetween(item, now.minusHours(2), now.plusHours(24));
+
+    //    if (bookingNext != null && bookingLast != null) {
+    //        item.setLastBooking(bookingLast);
+     //       item.setNextBooking(bookingNext);
+    //    }
+        //    this.synchronizeTime(item);
+ //       if (item.getNextBooking().equals(item.getLastBooking())) {
+   //         item.setNextBooking(booking);
+     //       return item;
+   //     } else {
+   //         return item;
+  //      }
+        return item;
     }
 
     private Item synchronizeTime(Item item) {

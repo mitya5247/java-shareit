@@ -6,6 +6,7 @@ import ru.practicum.shareit.booking.State;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 
+import java.awt.print.Book;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,12 +20,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findAllByBookerAndEndAfterOrderByStartDesc(User user, LocalDateTime moment);
 
-    List<Booking> findAllByBookerAndAndEndBeforeOrderByStartDesc(User user, LocalDateTime moment);
-
     List<Booking> findAllByBookerAndEndBeforeOrderByStartDesc(User user, LocalDateTime moment);
-
-
- //   List<Booking> findAllByItemInAndStartAfterOrderByStartDesc(List<Item> items, LocalDateTime moment);
 
     List<Booking> findAllByItemInAndEndAfterOrderByStartDesc(List<Item> items, LocalDateTime moment);
 
@@ -34,5 +30,18 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findAllByBookerAndStartBeforeAndEndAfterOrderByStartAsc(User user, LocalDateTime now, LocalDateTime now1); // новый
 
-    List<Booking> findAllByItemInAndStartBeforeAndEndAfterOrderByStartDesc(List<Item> items, LocalDateTime now, LocalDateTime now1); // новый
+    List<Booking> findAllByItemInAndStartBeforeAndEndAfterOrderByStartDesc(List<Item> items, LocalDateTime now,
+                                                                           LocalDateTime now1); // новый
+
+//    List<Booking> findAllByItemAndStatus(Item item, State state);
+
+ //   Booking findByItemAndEndBeforeOrderByStartDesc(Item item, LocalDateTime moment); // PAST
+ //   Booking findByItemAndEndAfterOrderByStartDesc(Item item, LocalDateTime moment); // FUTURE
+  //  Booking findByItemAndStartBetween(Item item, LocalDateTime moment, LocalDateTime moment1);
+
+    Booking findFirstByItemAndStartBetweenOrderByStartDesc(Item item, LocalDateTime moment, LocalDateTime moment1);
+
+    Booking findFirstByBookerAndItemOrderByStart(User user, Item item);
+
+
 }

@@ -19,8 +19,10 @@ public class Mapper {
         itemDto.setName(item.getName());
         itemDto.setDescription(item.getDescription());
         itemDto.setAvailable(item.isAvailable());
-        if (item.getNextBooking() != null || item.getLastBooking() != null) {
+        if (item.getLastBooking() != null) {
             itemDto.setLastBooking(Mapper.convertToBookingDto(item.getLastBooking()));
+        }
+        if (item.getNextBooking() != null) {
             itemDto.setNextBooking(Mapper.convertToBookingDto(item.getNextBooking()));
         }
 
