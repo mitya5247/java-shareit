@@ -33,8 +33,8 @@ public class ItemController {
     }
 
     @GetMapping("/{id}")
-    public ItemDto get(@PathVariable Long id) {
-        return service.get(id);
+    public ItemDto get(@RequestHeader(Constants.HEADER) Long userId, @PathVariable Long id) {
+        return service.get(userId, id);
     }
 
     @GetMapping

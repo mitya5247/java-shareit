@@ -13,6 +13,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -45,9 +46,17 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto get(Long id) {
+    public ItemDto get(Long userId, Long id) {
         Item item = this.itemNotFound(id);
-        return Mapper.convertToDto(item);
+ //       if (item.getNextBooking() != null && item.getNextBooking().getEnd().isBefore(LocalDateTime.now())) {
+ //           item.setLastBooking(item.getNextBooking());
+ //       }
+        ItemDto itemDto = Mapper.convertToDto(item);
+        if (!userId.equals(item.getOwner())) {
+            itemDto.setLastBooking(null);
+            itemDto.setNextBooking(null);
+        }
+        return itemDto;
     }
 
     @Override

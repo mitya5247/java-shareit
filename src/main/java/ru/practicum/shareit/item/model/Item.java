@@ -7,6 +7,7 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.item.Mapper;
 
 import javax.persistence.*;
+import java.util.List;
 
 /**
  * TODO Sprint add-controllers.

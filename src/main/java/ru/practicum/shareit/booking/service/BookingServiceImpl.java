@@ -22,8 +22,10 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import javax.persistence.EntityNotFoundException;
+import java.awt.print.Book;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -189,10 +191,23 @@ public class BookingServiceImpl implements BookingService {
             item.setNextBooking(booking);
             item.setLastBooking(booking);
             return item;
-        } else {
-            item.setLastBooking(item.getLastBooking());
+        }
+        this.synchronizeTime(item);
+        if (item.getNextBooking().equals(item.getLastBooking())) {
             item.setNextBooking(booking);
             return item;
+        } else {
+            return item;
         }
+   //     item.setLastBooking(item.getNextBooking());
+    //    item.setNextBooking(booking);
+    }
+
+    private Item synchronizeTime(Item item) {
+        LocalDateTime moment = LocalDateTime.now();
+        if (item.getNextBooking().getStart().isBefore(moment)) {
+            item.setLastBooking(item.getNextBooking());
+        }
+        return item;
     }
 }

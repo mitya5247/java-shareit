@@ -4,6 +4,7 @@ import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDtoWithoutBooking;
 import ru.practicum.shareit.item.model.Item;
 
 public class Mapper {
@@ -18,6 +19,15 @@ public class Mapper {
             itemDto.setNextBooking(Mapper.convertToBookingDto(item.getNextBooking()));
         }
         return itemDto;
+    }
+
+    public static ItemDtoWithoutBooking convertToDtoReq(Item item) {
+        ItemDtoWithoutBooking itemDtoWithoutBooking = new ItemDtoWithoutBooking();
+        itemDtoWithoutBooking.setId(item.getId());
+        itemDtoWithoutBooking.setName(item.getName());
+        itemDtoWithoutBooking.setDescription(item.getDescription());
+        itemDtoWithoutBooking.setAvailable(item.isAvailable());
+        return itemDtoWithoutBooking;
     }
 
     public static Item convertToItem(Long userId, ItemDto itemDto) {
