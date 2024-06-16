@@ -11,7 +11,9 @@ create table if not exists items (
     name varchar(100) not null,
     description varchar(500) not null,
     owner bigint,
-    available boolean
+    available boolean,
+    last_booking_id bigint,
+    next_booking_id bigint
 );
 
 create table if not exists bookings (

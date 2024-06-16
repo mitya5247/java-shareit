@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 public class BookingDto {
     Long id;
     @NotNull(message = "booker must not be null")
-    Long booker;
+    Long bookerId;
     @NotNull(message = "itemId must not be null")
     Long itemId;
     @Enumerated(EnumType.STRING)

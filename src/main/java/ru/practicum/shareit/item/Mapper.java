@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 
@@ -12,6 +13,10 @@ public class Mapper {
         itemDto.setName(item.getName());
         itemDto.setDescription(item.getDescription());
         itemDto.setAvailable(item.isAvailable());
+        if (item.getNextBooking() != null || item.getLastBooking() != null) {
+            itemDto.setLastBooking(Mapper.convertToBookingDto(item.getLastBooking()));
+            itemDto.setNextBooking(Mapper.convertToBookingDto(item.getNextBooking()));
+        }
         return itemDto;
     }
 
@@ -22,6 +27,10 @@ public class Mapper {
         item.setDescription(itemDto.getDescription());
         item.setOwner(userId);
         item.setAvailable(itemDto.getAvailable());
+        if (itemDto.getNextBooking() != null || itemDto.getLastBooking() != null) {
+            item.setLastBooking(Mapper.convertToBooking(itemDto.getLastBooking()));
+            item.setNextBooking(Mapper.convertToBooking(itemDto.getNextBooking()));
+        }
         return item;
     }
 
@@ -38,12 +47,25 @@ public class Mapper {
     public static BookingDto convertToBookingDto(Booking booking) {
         BookingDto bookingDto = new BookingDto();
 
+        bookingDto.setId(booking.getId());
         bookingDto.setStatus(booking.getStatus());
         bookingDto.setEnd(booking.getEnd());
         bookingDto.setStart(booking.getStart());
-        bookingDto.setBooker(booking.getBooker().getId());
+        bookingDto.setBookerId(booking.getBooker().getId());
         bookingDto.setItemId(booking.getItem().getId());
         return bookingDto;
+    }
+
+    public static BookingDtoResponse convertToBookingDtoResponse(Booking booking) {
+        BookingDtoResponse bookingDtoResponse = new BookingDtoResponse();
+
+        bookingDtoResponse.setId(booking.getId());
+        bookingDtoResponse.setStatus(booking.getStatus());
+        bookingDtoResponse.setEnd(booking.getEnd());
+        bookingDtoResponse.setStart(booking.getStart());
+        bookingDtoResponse.setBooker(booking.getBooker());
+        bookingDtoResponse.setItem(Mapper.convertToDto(booking.getItem()));
+        return bookingDtoResponse;
     }
 
 }

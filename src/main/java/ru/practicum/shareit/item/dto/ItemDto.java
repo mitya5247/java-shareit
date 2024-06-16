@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.shareit.booking.dto.BookingDto;
 
 import javax.persistence.*;
 import javax.validation.Valid;
@@ -28,4 +29,7 @@ public class ItemDto {
     String description;
     @NotNull(message = "available must not be null")
     Boolean available;
+    BookingDto lastBooking;
+    BookingDto nextBooking;
+
 }

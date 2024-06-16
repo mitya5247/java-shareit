@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.State;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.BadState;
 import ru.practicum.shareit.exceptions.BookingDtoIsNotValid;
@@ -25,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -38,7 +40,7 @@ public class BookingServiceImpl implements BookingService {
 
     @SneakyThrows
     @Override
-    public Booking createRequest(Long userId, BookingDto bookingDto) {
+    public BookingDtoResponse createRequest(Long userId, BookingDto bookingDto) {
         this.validateTimeBookingDto(bookingDto);
         Booking booking = Mapper.convertToBooking(bookingDto);
         User user = userRepository.findById(userId).orElseThrow(() ->
@@ -54,16 +56,18 @@ public class BookingServiceImpl implements BookingService {
         booking.setItem(item); // если он не owner доабвить if - else
         booking.setBooker(user);
         bookingRepository.save(booking);
-        return bookingRepository.save(booking);
+        return Mapper.convertToBookingDtoResponse(booking);
     }
 
     @SneakyThrows
     @Override
-    public Booking updateState(Long userId, Long bookingId, String state) {
+    public BookingDtoResponse updateState(Long userId, Long bookingId, String state) {
         Booking booking = this.bookingNotFound(bookingId);
-        if (!Objects.equals(booking.getItem().getOwner(), userId)) {
+        Item item = itemRepository.findById(booking.getItem().getId()).orElseThrow(() ->
+                new EntityNotFoundException("item c " + booking.getItem().getId() + " не найден"));
+        if (!Objects.equals(item.getOwner(), userId)) {
             throw new EntityNotFoundException("user c id " + userId + " не может поменять статус владельца вещи с id " +
-                    booking.getItem().getOwner());
+                    item.getOwner());
         }
         if (booking.getStatus().equals(State.APPROVED)) {
             throw new BadState("Бронь уже подтверждена");
@@ -71,27 +75,32 @@ public class BookingServiceImpl implements BookingService {
         switch (state) {
             case "true": booking.setStatus(State.APPROVED); // возможно применить break;
                 bookingRepository.save(booking); // поменять статус вещи на занято после статуса
-                return booking;
+                this.setNextBooking(item, booking);
+                itemRepository.save(item);
+                List<Item> items = itemRepository.findAll();
+                return Mapper.convertToBookingDtoResponse(booking);
             case "false" : booking.setStatus(State.REJECTED);
                 bookingRepository.save(booking);
-                return booking;
+                return Mapper.convertToBookingDtoResponse(booking);
             default: throw new BadState("некоректный параметр state");
         }
     }
 
     @Override
-    public Booking get(Long userId, Long bookingId) {
+    public BookingDtoResponse get(Long userId, Long bookingId) {
         Booking booking = this.bookingNotFound(bookingId);
-        if (!Objects.equals(booking.getBooker().getId(), userId) && !Objects.equals(booking.getItem().getOwner(), userId)) {
+        Item item = itemRepository.findById(booking.getItem().getId()).orElseThrow(() ->
+                new EntityNotFoundException("item c " + booking.getItem().getId() + " не найден"));
+        if (!Objects.equals(booking.getBooker().getId(), userId) && !Objects.equals(item.getOwner(), userId)) {
             throw new EntityNotFoundException("user c id " + userId + " не может просматривать статус запроса с id " +
                     booking.getId());
         }
-        return booking;
+        return Mapper.convertToBookingDtoResponse(booking);
     }
 
     @SneakyThrows
     @Override
-    public List<Booking> getAllUserBookings(Long userId, String state) {
+    public List<BookingDtoResponse> getAllUserBookings(Long userId, String state) {
         List<Booking> bookings = new ArrayList<>();
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new EntityNotFoundException("user c " + userId + " не найден"));
@@ -100,12 +109,14 @@ public class BookingServiceImpl implements BookingService {
         }
         List<Booking> bookingsAll = bookingRepository.findAll();
         bookings = this.chooseRequest(user, State.valueOf(state));
-        return bookings;
+        return bookings.stream()
+                .map(Mapper::convertToBookingDtoResponse)
+                .collect(Collectors.toList());
     }
 
     @SneakyThrows
     @Override
-    public List<Booking> getAllItemsBooked(Long userId, String state) {
+    public List<BookingDtoResponse> getAllItemsBooked(Long userId, String state) {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new EntityNotFoundException("user c " + userId + " не найден"));
         List<Booking> bookings = new ArrayList<>();
@@ -117,7 +128,9 @@ public class BookingServiceImpl implements BookingService {
         if (!items.isEmpty()) {
             bookings = this.chooseRequestForOwner(items, State.valueOf(state));
         }
-        return bookings;
+        return bookings.stream()
+                .map(Mapper::convertToBookingDtoResponse)
+                .collect(Collectors.toList());
     }
 
     @SneakyThrows
@@ -168,6 +181,18 @@ public class BookingServiceImpl implements BookingService {
             case WAITING: return bookingRepository.findAllByStatusAndItemInOrderByStartDesc(State.WAITING, items);
             case ALL: return bookingRepository.findAllByItemInOrderByStartDesc(items);
             default: throw new BadState("Неккоректный статус " + state);
+        }
+    }
+
+    private Item setNextBooking(Item item, Booking booking) {
+        if (item.getNextBooking() == null && item.getLastBooking() == null) {
+            item.setNextBooking(booking);
+            item.setLastBooking(booking);
+            return item;
+        } else {
+            item.setLastBooking(item.getLastBooking());
+            item.setNextBooking(booking);
+            return item;
         }
     }
 }

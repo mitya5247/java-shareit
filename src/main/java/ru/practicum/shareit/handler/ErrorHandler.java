@@ -52,4 +52,12 @@ public class ErrorHandler {
         log.info(exception.getMessage());
         return new ErrorResponse(exception.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleItemNotFound(final StackOverflowError exception) {
+        log.info("stack over flow");
+        log.info(exception.getMessage());
+        return new ErrorResponse(exception.getMessage());
+    }
 }
