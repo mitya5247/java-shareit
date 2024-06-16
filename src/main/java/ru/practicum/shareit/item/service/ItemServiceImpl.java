@@ -6,11 +6,16 @@ import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exceptions.BadComment;
 import ru.practicum.shareit.exceptions.EntityNotFoundException;
 import ru.practicum.shareit.item.Mapper;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
@@ -28,11 +33,17 @@ public class ItemServiceImpl implements ItemService {
     ItemRepository repository;
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    CommentRepository commentRepository;
 
     @Override
     public ItemDto add(Long userId, ItemDto itemDto) {
         this.checkExistUser(userId);
+        List<Comment> comments = new ArrayList<>();
+        List<CommentDto> commentDtos = new ArrayList<>();
+        itemDto.setComments(commentDtos);
         Item item = Mapper.convertToItem(userId, itemDto);
+        item.setComments(comments);
         return Mapper.convertToDto(repository.save(item));
     }
 
@@ -79,6 +90,24 @@ public class ItemServiceImpl implements ItemService {
                     .collect(Collectors.toList());
         }
         return itemDto;
+    }
+
+    @SneakyThrows
+    @Override
+    public CommentDto addComment(Long userId, Long itemId, Comment comment) {
+        Item item = itemNotFound(itemId);
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new EntityNotFoundException("user c id " + userId + " не сущуствует"));
+        if (item.getLastBooking().getStart().isAfter(LocalDateTime.now())) {
+            throw new BadComment("нельзя добавить комментарий о бронировании в будущем");
+        }
+        if (item.getLastBooking().getBooker().getId().equals(userId)) {
+            comment.setUser(user);
+            comment.setCreated(LocalDateTime.now());
+        }
+        item.getComments().add(commentRepository.save(comment));
+        repository.save(item);
+        return Mapper.convertCommentToDto(comment);
     }
 
     @SneakyThrows

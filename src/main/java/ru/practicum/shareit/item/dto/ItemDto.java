@@ -34,5 +34,5 @@ public class ItemDto {
     Boolean available;
     BookingDto lastBooking;
     BookingDto nextBooking;
-    List<Comment> comments;
+    List<CommentDto> comments;
 }

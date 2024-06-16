@@ -3,9 +3,14 @@ package ru.practicum.shareit.item;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoWithoutBooking;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Mapper {
     public static ItemDto convertToDto(Item item) {
@@ -14,23 +19,17 @@ public class Mapper {
         itemDto.setName(item.getName());
         itemDto.setDescription(item.getDescription());
         itemDto.setAvailable(item.isAvailable());
-        if (item.getComments() != null) {
-            item.setComments(item.getComments());
-        }
         if (item.getNextBooking() != null || item.getLastBooking() != null) {
             itemDto.setLastBooking(Mapper.convertToBookingDto(item.getLastBooking()));
             itemDto.setNextBooking(Mapper.convertToBookingDto(item.getNextBooking()));
         }
-        return itemDto;
-    }
 
-    public static ItemDtoWithoutBooking convertToDtoReq(Item item) {
-        ItemDtoWithoutBooking itemDtoWithoutBooking = new ItemDtoWithoutBooking();
-        itemDtoWithoutBooking.setId(item.getId());
-        itemDtoWithoutBooking.setName(item.getName());
-        itemDtoWithoutBooking.setDescription(item.getDescription());
-        itemDtoWithoutBooking.setAvailable(item.isAvailable());
-        return itemDtoWithoutBooking;
+        List<CommentDto> commentDtoList = item.getComments().stream()
+                .map(comment -> Mapper.convertCommentToDto(comment))
+                .collect(Collectors.toList());
+        itemDto.setComments(commentDtoList);
+
+        return itemDto;
     }
 
     public static Item convertToItem(Long userId, ItemDto itemDto) {
@@ -40,9 +39,6 @@ public class Mapper {
         item.setDescription(itemDto.getDescription());
         item.setOwner(userId);
         item.setAvailable(itemDto.getAvailable());
-        if (itemDto.getComments() != null) {
-            item.setComments(itemDto.getComments());
-        }
         if (itemDto.getNextBooking() != null || itemDto.getLastBooking() != null) {
             item.setLastBooking(Mapper.convertToBooking(itemDto.getLastBooking()));
             item.setNextBooking(Mapper.convertToBooking(itemDto.getNextBooking()));
@@ -82,6 +78,16 @@ public class Mapper {
         bookingDtoResponse.setBooker(booking.getBooker());
         bookingDtoResponse.setItem(Mapper.convertToDto(booking.getItem()));
         return bookingDtoResponse;
+    }
+
+    public static CommentDto convertCommentToDto(Comment comment) {
+        CommentDto commentDto = new CommentDto();
+
+        commentDto.setId(comment.getId());
+        commentDto.setText(comment.getText());
+        commentDto.setAuthorName(comment.getUser().getName());
+        commentDto.setCreated(comment.getCreated());
+        return commentDto;
     }
 
 }
