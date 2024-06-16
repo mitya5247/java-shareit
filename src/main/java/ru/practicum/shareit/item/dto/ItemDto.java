@@ -3,12 +3,15 @@ package ru.practicum.shareit.item.dto;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.item.model.Comment;
 
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+
+import java.util.List;
 
 import static javax.persistence.GenerationType.IDENTITY;
 
@@ -31,5 +34,5 @@ public class ItemDto {
     Boolean available;
     BookingDto lastBooking;
     BookingDto nextBooking;
-
+    List<Comment> comments;
 }

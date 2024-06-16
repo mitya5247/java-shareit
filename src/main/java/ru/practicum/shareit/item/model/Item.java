@@ -36,4 +36,7 @@ public class Item {
     @OneToOne
     @JoinColumn(name = "next_booking_id")
     Booking nextBooking;
+    @OneToMany
+    @JoinColumn(name = "id")
+    List<Comment> comments;
 }
