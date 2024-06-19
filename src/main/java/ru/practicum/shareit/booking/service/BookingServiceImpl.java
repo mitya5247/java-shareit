@@ -139,8 +139,8 @@ public class BookingServiceImpl implements BookingService {
 
     @SneakyThrows
     private Booking bookingNotFound(Long bookingId) {
-        return bookingRepository.findById(bookingId).orElseThrow(() -> new ItemNotFound
-                ("booking c id " + bookingId + " не найден"));
+        return bookingRepository.findById(bookingId).orElseThrow(() -> new ItemNotFound(
+                "booking c id " + bookingId + " не найден"));
     }
 
     private void validateTimeBookingDto(BookingDto bookingDto) throws BookingDtoIsNotValid {
