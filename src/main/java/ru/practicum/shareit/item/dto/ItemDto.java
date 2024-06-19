@@ -11,8 +11,6 @@ import javax.validation.constraints.Positive;
 
 import java.util.List;
 
-import static javax.persistence.GenerationType.IDENTITY;
-
 /**
  * TODO Sprint add-controllers.
  */

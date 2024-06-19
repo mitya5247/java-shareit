@@ -129,6 +129,7 @@ public class ItemServiceImpl implements ItemService {
         return repository.findById(itemId).orElseThrow(() ->
                 new EntityNotFound("item c id " + itemId + " не найден"));
     }
+
     @SneakyThrows
     private void fillFields(Long userId, Item item, ItemDto itemDto) {
         if (Objects.equals(item.getOwner(), userId)) {

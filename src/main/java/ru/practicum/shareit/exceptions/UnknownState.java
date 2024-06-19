@@ -3,7 +3,7 @@ package ru.practicum.shareit.exceptions;
 import lombok.Getter;
 
 @Getter
-public class UnknownState extends Exception{
+public class UnknownState extends Exception {
 
     String error;
 

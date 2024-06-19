@@ -41,8 +41,8 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = Mapper.convertToBooking(bookingDto);
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new EntityNotFoundException("user c " + userId + " не найден"));
-        Item item = itemRepository.findById(bookingDto.getItemId()).orElseThrow( () ->
-            new EntityNotFound("item c " + bookingDto.getItemId() + " не найден"));
+        Item item = itemRepository.findById(bookingDto.getItemId()).orElseThrow(() ->
+                new EntityNotFound("item c " + bookingDto.getItemId() + " не найден"));
         if (!item.isAvailable()) {
             throw new ItemIsUnAvailable("item с id " + item.getId() + " недоступен для брони");
         }
@@ -69,14 +69,17 @@ public class BookingServiceImpl implements BookingService {
             throw new UnknownState("Бронь уже подтверждена");
         }
         switch (state) {
-            case "true": booking.setStatus(State.APPROVED);
+            case "true":
+                booking.setStatus(State.APPROVED);
                 bookingRepository.save(booking);
                 itemRepository.save(item);
                 return Mapper.convertToBookingDtoResponse(booking);
-            case "false" : booking.setStatus(State.REJECTED);
+            case "false":
+                booking.setStatus(State.REJECTED);
                 bookingRepository.save(booking);
                 return Mapper.convertToBookingDtoResponse(booking);
-            default: throw new UnknownState("некоректный параметр state");
+            default:
+                throw new UnknownState("некоректный параметр state");
         }
     }
 
@@ -160,30 +163,46 @@ public class BookingServiceImpl implements BookingService {
             state = State.ALL;
         }
         switch (state) {
-            case CURRENT: return bookingRepository.findAllByBookerAndStartBeforeAndEndAfterOrderByStartAsc(user,
-                    LocalDateTime.now(), LocalDateTime.now());
-            case FUTURE: return bookingRepository.findAllByBookerAndEndAfterOrderByStartDesc(user, LocalDateTime.now());
-            case PAST: return bookingRepository.findAllByBookerAndEndBeforeOrderByStartDesc(user, LocalDateTime.now());
-            case APPROVED: return bookingRepository.findAllByStatusAndBookerOrderByStartDesc(State.APPROVED, user);
-            case REJECTED: return bookingRepository.findAllByStatusAndBookerOrderByStartDesc(State.REJECTED, user);
-            case WAITING: return bookingRepository.findAllByStatusAndBookerOrderByStartDesc(State.WAITING, user);
-            case ALL: return bookingRepository.findAllByBookerOrderByStartDesc(user);
-            default: throw new UnknownState("UnknownState: " + state);
+            case CURRENT:
+                return bookingRepository.findAllByBookerAndStartBeforeAndEndAfterOrderByStartAsc(user,
+                        LocalDateTime.now(), LocalDateTime.now());
+            case FUTURE:
+                return bookingRepository.findAllByBookerAndEndAfterOrderByStartDesc(user, LocalDateTime.now());
+            case PAST:
+                return bookingRepository.findAllByBookerAndEndBeforeOrderByStartDesc(user, LocalDateTime.now());
+            case APPROVED:
+                return bookingRepository.findAllByStatusAndBookerOrderByStartDesc(State.APPROVED, user);
+            case REJECTED:
+                return bookingRepository.findAllByStatusAndBookerOrderByStartDesc(State.REJECTED, user);
+            case WAITING:
+                return bookingRepository.findAllByStatusAndBookerOrderByStartDesc(State.WAITING, user);
+            case ALL:
+                return bookingRepository.findAllByBookerOrderByStartDesc(user);
+            default:
+                throw new UnknownState("UnknownState: " + state);
         }
     }
 
     @SneakyThrows
     private List<Booking> chooseRequestForOwner(List<Item> items, State state) {
         switch (state) {
-            case CURRENT: return bookingRepository.findAllByItemInAndStartBeforeAndEndAfterOrderByStartDesc(items,
-                    LocalDateTime.now(), LocalDateTime.now());
-            case FUTURE: return bookingRepository.findAllByItemInAndEndAfterOrderByStartDesc(items, LocalDateTime.now());
-            case PAST: return bookingRepository.findAllByItemInAndEndBeforeOrderByStartDesc(items, LocalDateTime.now());
-            case APPROVED: return bookingRepository.findAllByStatusAndItemInOrderByStartDesc(State.APPROVED, items);
-            case REJECTED: return bookingRepository.findAllByStatusAndItemInOrderByStartDesc(State.REJECTED, items);
-            case WAITING: return bookingRepository.findAllByStatusAndItemInOrderByStartDesc(State.WAITING, items);
-            case ALL: return bookingRepository.findAllByItemInOrderByStartDesc(items);
-            default: throw new UnknownState("UnknownState: " + state);
+            case CURRENT:
+                return bookingRepository.findAllByItemInAndStartBeforeAndEndAfterOrderByStartDesc(items,
+                        LocalDateTime.now(), LocalDateTime.now());
+            case FUTURE:
+                return bookingRepository.findAllByItemInAndEndAfterOrderByStartDesc(items, LocalDateTime.now());
+            case PAST:
+                return bookingRepository.findAllByItemInAndEndBeforeOrderByStartDesc(items, LocalDateTime.now());
+            case APPROVED:
+                return bookingRepository.findAllByStatusAndItemInOrderByStartDesc(State.APPROVED, items);
+            case REJECTED:
+                return bookingRepository.findAllByStatusAndItemInOrderByStartDesc(State.REJECTED, items);
+            case WAITING:
+                return bookingRepository.findAllByStatusAndItemInOrderByStartDesc(State.WAITING, items);
+            case ALL:
+                return bookingRepository.findAllByItemInOrderByStartDesc(items);
+            default:
+                throw new UnknownState("UnknownState: " + state);
         }
     }
 
