@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
-import net.bytebuddy.asm.Advice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -13,9 +12,7 @@ import ru.practicum.shareit.booking.State;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.exceptions.BadState;
-import ru.practicum.shareit.exceptions.BookingDtoIsNotValid;
-import ru.practicum.shareit.exceptions.ItemIsUnAvailable;
+import ru.practicum.shareit.exceptions.*;
 import ru.practicum.shareit.item.Mapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -45,14 +42,14 @@ public class BookingServiceImpl implements BookingService {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new EntityNotFoundException("user c " + userId + " не найден"));
         Item item = itemRepository.findById(bookingDto.getItemId()).orElseThrow( () ->
-            new EntityNotFoundException("item c " + bookingDto.getItemId() + " не найден"));
+            new EntityNotFound("item c " + bookingDto.getItemId() + " не найден"));
         if (!item.isAvailable()) {
             throw new ItemIsUnAvailable("item с id " + item.getId() + " недоступен для брони");
         }
         if (item.getOwner().equals(userId)) {
-            throw new EntityNotFoundException("пользователь не может забронить свою вещь");
+            throw new EntityNotFound("пользователь не может забронить свою вещь");
         }
-        booking.setItem(item); // если он не owner доабвить if - else
+        booking.setItem(item);
         booking.setBooker(user);
         bookingRepository.save(booking);
         return Mapper.convertToBookingDtoResponse(booking);
@@ -63,35 +60,34 @@ public class BookingServiceImpl implements BookingService {
     public BookingDtoResponse updateState(Long userId, Long bookingId, String state) {
         Booking booking = this.bookingNotFound(bookingId);
         Item item = itemRepository.findById(booking.getItem().getId()).orElseThrow(() ->
-                new EntityNotFoundException("item c " + booking.getItem().getId() + " не найден"));
+                new EntityNotFound("item c " + booking.getItem().getId() + " не найден"));
         if (!Objects.equals(item.getOwner(), userId)) {
-            throw new EntityNotFoundException("user c id " + userId + " не может поменять статус владельца вещи с id " +
+            throw new EntityNotFound("user c id " + userId + " не может поменять статус владельца вещи с id " +
                     item.getOwner());
         }
         if (booking.getStatus().equals(State.APPROVED)) {
-            throw new BadState("Бронь уже подтверждена");
+            throw new UnknownState("Бронь уже подтверждена");
         }
         switch (state) {
-            case "true": booking.setStatus(State.APPROVED); // возможно применить break;
-                bookingRepository.save(booking); // поменять статус вещи на занято после статуса
-                // this.setNextBooking(item, booking);
+            case "true": booking.setStatus(State.APPROVED);
+                bookingRepository.save(booking);
                 itemRepository.save(item);
-                List<Item> items = itemRepository.findAll();
                 return Mapper.convertToBookingDtoResponse(booking);
             case "false" : booking.setStatus(State.REJECTED);
                 bookingRepository.save(booking);
                 return Mapper.convertToBookingDtoResponse(booking);
-            default: throw new BadState("некоректный параметр state");
+            default: throw new UnknownState("некоректный параметр state");
         }
     }
 
+    @SneakyThrows
     @Override
     public BookingDtoResponse get(Long userId, Long bookingId) {
         Booking booking = this.bookingNotFound(bookingId);
         Item item = itemRepository.findById(booking.getItem().getId()).orElseThrow(() ->
-                new EntityNotFoundException("item c " + booking.getItem().getId() + " не найден"));
+                new EntityNotFound("item c " + booking.getItem().getId() + " не найден"));
         if (!Objects.equals(booking.getBooker().getId(), userId) && !Objects.equals(item.getOwner(), userId)) {
-            throw new EntityNotFoundException("user c id " + userId + " не может просматривать статус запроса с id " +
+            throw new EntityNotFound("user c id " + userId + " не может просматривать статус запроса с id " +
                     booking.getId());
         }
         return Mapper.convertToBookingDtoResponse(booking);
@@ -100,14 +96,17 @@ public class BookingServiceImpl implements BookingService {
     @SneakyThrows
     @Override
     public List<BookingDtoResponse> getAllUserBookings(Long userId, String state) {
-        List<Booking> bookings = new ArrayList<>();
+        List<Booking> bookings;
         User user = userRepository.findById(userId).orElseThrow(() ->
-                new EntityNotFoundException("user c " + userId + " не найден"));
+                new EntityNotFound("user c " + userId + " не найден"));
         if (state == null) {
             state = String.valueOf(State.ALL);
         }
-        List<Booking> bookingsAll = bookingRepository.findAll();
-        bookings = this.chooseRequest(user, State.valueOf(state));
+        try {
+            bookings = this.chooseRequest(user, State.valueOf(state));
+        } catch (IllegalArgumentException e) {
+            throw new UnknownState("Unknown state: " + state);
+        }
         return bookings.stream()
                 .map(Mapper::convertToBookingDtoResponse)
                 .collect(Collectors.toList());
@@ -117,15 +116,18 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDtoResponse> getAllItemsBooked(Long userId, String state) {
         User user = userRepository.findById(userId).orElseThrow(() ->
-                new EntityNotFoundException("user c " + userId + " не найден"));
+                new EntityNotFound("user c " + userId + " не найден"));
         List<Booking> bookings = new ArrayList<>();
-        List<Booking> bookingsAll = bookingRepository.findAll();
         if (state == null) {
             state = String.valueOf(State.ALL);
         }
         List<Item> items = itemRepository.findAllByOwnerOrderById(userId);
         if (!items.isEmpty()) {
-            bookings = this.chooseRequestForOwner(items, State.valueOf(state));
+            try {
+                bookings = this.chooseRequestForOwner(items, State.valueOf(state));
+            } catch (IllegalArgumentException e) {
+                throw new UnknownState("Unknown state: " + state);
+            }
         }
         return bookings.stream()
                 .map(Mapper::convertToBookingDtoResponse)
@@ -134,7 +136,7 @@ public class BookingServiceImpl implements BookingService {
 
     @SneakyThrows
     private Booking bookingNotFound(Long bookingId) {
-        return bookingRepository.findById(bookingId).orElseThrow(() -> new EntityNotFoundException
+        return bookingRepository.findById(bookingId).orElseThrow(() -> new ItemNotFound
                 ("booking c id " + bookingId + " не найден"));
     }
 
@@ -152,7 +154,8 @@ public class BookingServiceImpl implements BookingService {
     }
 
 
-    private List<Booking> chooseRequest(User user, State state) throws BadState {
+    @SneakyThrows
+    private List<Booking> chooseRequest(User user, State state) {
         if (state == null) {
             state = State.ALL;
         }
@@ -165,11 +168,12 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED: return bookingRepository.findAllByStatusAndBookerOrderByStartDesc(State.REJECTED, user);
             case WAITING: return bookingRepository.findAllByStatusAndBookerOrderByStartDesc(State.WAITING, user);
             case ALL: return bookingRepository.findAllByBookerOrderByStartDesc(user);
-            default: throw new BadState("Неккоректный статус " + state);
+            default: throw new UnknownState("UnknownState: " + state);
         }
     }
 
-    private List<Booking> chooseRequestForOwner(List<Item> items, State state) throws BadState {
+    @SneakyThrows
+    private List<Booking> chooseRequestForOwner(List<Item> items, State state) {
         switch (state) {
             case CURRENT: return bookingRepository.findAllByItemInAndStartBeforeAndEndAfterOrderByStartDesc(items,
                     LocalDateTime.now(), LocalDateTime.now());
@@ -179,49 +183,8 @@ public class BookingServiceImpl implements BookingService {
             case REJECTED: return bookingRepository.findAllByStatusAndItemInOrderByStartDesc(State.REJECTED, items);
             case WAITING: return bookingRepository.findAllByStatusAndItemInOrderByStartDesc(State.WAITING, items);
             case ALL: return bookingRepository.findAllByItemInOrderByStartDesc(items);
-            default: throw new BadState("Неккоректный статус " + state);
+            default: throw new UnknownState("UnknownState: " + state);
         }
     }
 
-    private Item setNextBooking(Item item, Booking booking) {
-        if (item.getNextBooking() == null && item.getLastBooking() == null) {
-            item.setNextBooking(booking);
-            item.setLastBooking(booking);
-            return item;
-        }
-   //     List<Booking> bookings = bookingRepository.findAllByItemAndStatus(item, State.FUTURE);
-      //  if (!bookings.isEmpty()) {
-   //     bookings = bookings.stream()
-    //            .sorted(Comparator.comparing(Booking::getStart))
-    //            .collect(Collectors.toList());
-    //        item.setLastBooking(bookings.get(0));
-    //        if (bookings.size() > 1) {
-   //             item.setNextBooking(bookings.get(1));
-     //       }
-     //   }
-        LocalDateTime now = LocalDateTime.now();
-     //   Booking bookingLast = bookingRepository.findByItemAndStartBetween(item, now.minusHours(24), now.plusHours(12));
-     //   Booking bookingNext = bookingRepository.findByItemAndStartBetween(item, now.minusHours(2), now.plusHours(24));
-
-    //    if (bookingNext != null && bookingLast != null) {
-    //        item.setLastBooking(bookingLast);
-     //       item.setNextBooking(bookingNext);
-    //    }
-        //    this.synchronizeTime(item);
- //       if (item.getNextBooking().equals(item.getLastBooking())) {
-   //         item.setNextBooking(booking);
-     //       return item;
-   //     } else {
-   //         return item;
-  //      }
-        return item;
-    }
-
-    private Item synchronizeTime(Item item) {
-        LocalDateTime moment = LocalDateTime.now();
-        if (item.getNextBooking().getStart().isBefore(moment)) {
-            item.setLastBooking(item.getNextBooking());
-        }
-        return item;
-    }
 }

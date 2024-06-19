@@ -15,10 +15,8 @@ import static javax.persistence.GenerationType.*;
 /**
  * TODO Sprint add-controllers.
  */
-// @Data
 @Valid
 @FieldDefaults(level = AccessLevel.PRIVATE)
-// @Builder
 @Entity
 @Table(name = "users")
 @Getter

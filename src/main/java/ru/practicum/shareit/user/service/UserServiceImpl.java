@@ -7,13 +7,12 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.EmailAlreadyExistsException;
-import ru.practicum.shareit.exceptions.EntityNotFoundException;
+import ru.practicum.shareit.exceptions.EntityNotFound;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -25,17 +24,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(User user) throws EmailAlreadyExistsException {
-   //     this.checkEmailOnDuplicate(user.getEmail());
-        List<User> users = this.getAll();
         return repository.save(user);
     }
 
     @Override
     public User update(Long userId, User user) {
         User user1 = this.userNotFound(userId);
-    //    if (!user1.getEmail().equals(user.getEmail())) {
-    //        this.checkEmailOnDuplicate(user.getEmail());
-     //   }
         this.fillFields(user1, user);
         repository.save(user1);
         log.info("обновлен пользователь с id " + user.getId());
@@ -62,11 +56,7 @@ public class UserServiceImpl implements UserService {
 
     @SneakyThrows
     private User userNotFound(Long id) {
-        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("user c id " + id + " не найден"));
-   //     return repository.findAll().stream()
-   //             .filter(user -> Objects.equals(user.getId(), id))
-   //             .findFirst()
-   //             .orElseThrow(() -> new EntityNotFoundException("user c id " + id + " не найден"));
+        return repository.findById(id).orElseThrow(() -> new EntityNotFound("user c id " + id + " не найден"));
     }
 
     @SneakyThrows

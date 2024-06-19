@@ -10,7 +10,7 @@ import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.State;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exceptions.BadComment;
-import ru.practicum.shareit.exceptions.EntityNotFoundException;
+import ru.practicum.shareit.exceptions.EntityNotFound;
 import ru.practicum.shareit.item.Mapper;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -64,9 +64,6 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto get(Long userId, Long id) {
         Item item = this.itemNotFound(id);
- //       if (item.getNextBooking() != null && item.getNextBooking().getEnd().isBefore(LocalDateTime.now())) {
- //           item.setLastBooking(item.getNextBooking());
- //       }
         this.synchronizeBooking(item);
         ItemDto itemDto = Mapper.convertToDto(item);
         if (!userId.equals(item.getOwner())) {
@@ -104,10 +101,7 @@ public class ItemServiceImpl implements ItemService {
     public CommentDto addComment(Long userId, Long itemId, Comment comment) {
         Item item = itemNotFound(itemId);
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new EntityNotFoundException("user c id " + userId + " не сущуствует"));
-  //      if (item.getLastBooking().getStart().isAfter(LocalDateTime.now())) {
-   //         throw new BadComment("нельзя добавить комментарий о бронировании в будущем");
-    //    }
+                () -> new EntityNotFound("user c id " + userId + " не сущуствует"));
         Booking booking = bookingRepository.findFirstByBookerAndItemOrderByStart(user, item);
         LocalDateTime now = LocalDateTime.now();
         if (booking == null) {
@@ -127,21 +121,13 @@ public class ItemServiceImpl implements ItemService {
 
     @SneakyThrows
     private void checkExistUser(Long id) {
-        userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("user c id " + id + " не сущуствует"));
-      //  userRepository.findAll().stream()
-      //          .filter(user -> Objects.equals(user.getId(), id))
-      //          .findFirst()
-       //         .orElseThrow(() -> new EntityNotFoundException("user c id " + id + " не сущуствует"));
+        userRepository.findById(id).orElseThrow(() -> new EntityNotFound("user c id " + id + " не сущуствует"));
     }
 
     @SneakyThrows
     private Item itemNotFound(Long itemId) {
         return repository.findById(itemId).orElseThrow(() ->
-                new EntityNotFoundException("item c id " + itemId + " не найден"));
-     //   return repository.findAll().stream()
-       //         .filter(item -> Objects.equals(item.getId(), itemId))
-       //         .findFirst()
-      //          .orElseThrow(() -> new EntityNotFoundException("item c id " + itemId + " не найден"));
+                new EntityNotFound("item c id " + itemId + " не найден"));
     }
     @SneakyThrows
     private void fillFields(Long userId, Item item, ItemDto itemDto) {
@@ -156,20 +142,26 @@ public class ItemServiceImpl implements ItemService {
                 item.setAvailable(itemDto.getAvailable());
             }
         } else {
-            throw new EntityNotFoundException("user c id " + userId + " не совпадает с создателем item id " +
+            throw new EntityNotFound("user c id " + userId + " не совпадает с создателем item id " +
                     item.getId());
         }
     }
 
     private Item synchronizeBooking(Item item) {
         LocalDateTime now = LocalDateTime.now();
-        Booking nextBooking = bookingRepository.findFirstByItemAndStartBetweenOrderByStartDesc(item, now, now.plusHours(1));
+        Booking nextBooking = bookingRepository.findFirstByItemAndStartBetweenOrderByStartDesc(item,
+                now, now.plusHours(12));
         if (nextBooking != null) {
-            Booking lastBooking = bookingRepository.findFirstByItemAndStartBetweenOrderByStartDesc(item, now.minusHours(1),
-                    nextBooking.getStart().minusSeconds(1));
+            Booking lastBooking = bookingRepository.findFirstByItemAndStartBetweenOrderByStartDesc(item,
+                    now.minusHours(12), nextBooking.getStart().minusSeconds(1));
+            item.setLastBooking(lastBooking);
+        } else {
+            Booking lastBooking = bookingRepository.findFirstByItemAndStartBetweenOrderByStartDesc(item,
+                    now.minusHours(12), LocalDateTime.now());
             item.setLastBooking(lastBooking);
         }
         item.setNextBooking(nextBooking);
+
         return item;
     }
 

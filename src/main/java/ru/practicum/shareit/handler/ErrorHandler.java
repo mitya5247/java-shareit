@@ -13,7 +13,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNotFound(final EntityNotFoundException exception) {
+    public ErrorResponse handleNotFound(final EntityNotFound exception) {
         log.info(exception.getMessage());
         return new ErrorResponse(exception.getMessage());
     }
@@ -40,7 +40,7 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleItemNotFound(final ItemNotFound exception) {
         log.info(exception.getMessage());
         return new ErrorResponse(exception.getMessage());
@@ -48,9 +48,9 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleItemNotFound(final BadState exception) {
+    public UnknownState handleItemNotFound(final UnknownState exception) {
         log.info(exception.getMessage());
-        return new ErrorResponse(exception.getMessage());
+        return exception;
     }
 
     @ExceptionHandler
