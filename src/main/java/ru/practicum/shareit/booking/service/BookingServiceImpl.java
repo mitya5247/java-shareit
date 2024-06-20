@@ -40,14 +40,14 @@ public class BookingServiceImpl implements BookingService {
         this.validateTimeBookingDto(bookingDto);
         Booking booking = Mapper.convertToBooking(bookingDto);
         User user = userRepository.findById(userId).orElseThrow(() ->
-                new EntityNotFoundException("user c " + userId + " не найден"));
+                new EntityNotFoundException("user with id " + userId + " was not found"));
         Item item = itemRepository.findById(bookingDto.getItemId()).orElseThrow(() ->
-                new EntityNotFound("item c " + bookingDto.getItemId() + " не найден"));
+                new EntityNotFound("item with id " + bookingDto.getItemId() + " не найден"));
         if (!item.isAvailable()) {
-            throw new ItemIsUnAvailable("item с id " + item.getId() + " недоступен для брони");
+            throw new ItemIsUnAvailable("item with id " + item.getId() + " is not available for booking");
         }
         if (item.getOwner().equals(userId)) {
-            throw new EntityNotFound("пользователь не может забронить свою вещь");
+            throw new EntityNotFound("user couldn't book own item");
         }
         booking.setItem(item);
         booking.setBooker(user);
@@ -60,13 +60,13 @@ public class BookingServiceImpl implements BookingService {
     public BookingDtoResponse updateState(Long userId, Long bookingId, String state) {
         Booking booking = this.bookingNotFound(bookingId);
         Item item = itemRepository.findById(booking.getItem().getId()).orElseThrow(() ->
-                new EntityNotFound("item c " + booking.getItem().getId() + " не найден"));
+                new EntityNotFound("item with id " + booking.getItem().getId() + " was not found"));
         if (!Objects.equals(item.getOwner(), userId)) {
-            throw new EntityNotFound("user c id " + userId + " не может поменять статус владельца вещи с id " +
+            throw new EntityNotFound("user with id " + userId + " couldn't change owner's status of item with id " +
                     item.getOwner());
         }
         if (booking.getStatus().equals(State.APPROVED)) {
-            throw new UnknownState("Бронь уже подтверждена");
+            throw new UnknownState("booking is already accepted");
         }
         switch (state) {
             case "true":
@@ -79,7 +79,7 @@ public class BookingServiceImpl implements BookingService {
                 bookingRepository.save(booking);
                 return Mapper.convertToBookingDtoResponse(booking);
             default:
-                throw new UnknownState("некоректный параметр state");
+                throw new UnknownState("invalid state");
         }
     }
 
@@ -88,9 +88,9 @@ public class BookingServiceImpl implements BookingService {
     public BookingDtoResponse get(Long userId, Long bookingId) {
         Booking booking = this.bookingNotFound(bookingId);
         Item item = itemRepository.findById(booking.getItem().getId()).orElseThrow(() ->
-                new EntityNotFound("item c " + booking.getItem().getId() + " не найден"));
+                new EntityNotFound("item with id " + booking.getItem().getId() + " was not found"));
         if (!Objects.equals(booking.getBooker().getId(), userId) && !Objects.equals(item.getOwner(), userId)) {
-            throw new EntityNotFound("user c id " + userId + " не может просматривать статус запроса с id " +
+            throw new EntityNotFound("user with id " + userId + " не может просматривать статус запроса с id " +
                     booking.getId());
         }
         return Mapper.convertToBookingDtoResponse(booking);
@@ -101,7 +101,7 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingDtoResponse> getAllUserBookings(Long userId, String state) {
         List<Booking> bookings;
         User user = userRepository.findById(userId).orElseThrow(() ->
-                new EntityNotFound("user c " + userId + " не найден"));
+                new EntityNotFound("user with id " + userId + " was not found"));
         if (state == null) {
             state = String.valueOf(State.ALL);
         }
@@ -119,7 +119,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDtoResponse> getAllItemsBooked(Long userId, String state) {
         User user = userRepository.findById(userId).orElseThrow(() ->
-                new EntityNotFound("user c " + userId + " не найден"));
+                new EntityNotFound("user with id " + userId + " was not found"));
         List<Booking> bookings = new ArrayList<>();
         if (state == null) {
             state = String.valueOf(State.ALL);
@@ -140,19 +140,19 @@ public class BookingServiceImpl implements BookingService {
     @SneakyThrows
     private Booking bookingNotFound(Long bookingId) {
         return bookingRepository.findById(bookingId).orElseThrow(() -> new ItemNotFound(
-                "booking c id " + bookingId + " не найден"));
+                "booking with id " + bookingId + " was not found"));
     }
 
     private void validateTimeBookingDto(BookingDto bookingDto) throws BookingDtoIsNotValid {
         if (bookingDto.getStart() == null || bookingDto.getEnd() == null) {
-            throw new BookingDtoIsNotValid("start и end запроса не может быть равен null");
+            throw new BookingDtoIsNotValid("start and end time couldn't be null");
         } else if (bookingDto.getStart().equals(bookingDto.getEnd())) {
-            throw new BookingDtoIsNotValid("start запроса не может быть равен end");
+            throw new BookingDtoIsNotValid("start couldn't be equals end");
         } else if (bookingDto.getEnd().isBefore(LocalDateTime.now()) ||
                 bookingDto.getStart().isBefore(LocalDateTime.now())) {
-            throw new BookingDtoIsNotValid("end и start запроса не могут быть в прошлом");
+            throw new BookingDtoIsNotValid("end and start time couldn't be in past");
         } else if (bookingDto.getEnd().isBefore(bookingDto.getStart())) {
-            throw new BookingDtoIsNotValid("end запроса не может раньше start");
+            throw new BookingDtoIsNotValid("end couldn't be earlier than start");
         }
     }
 

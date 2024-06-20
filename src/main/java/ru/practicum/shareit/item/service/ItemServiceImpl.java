@@ -101,14 +101,14 @@ public class ItemServiceImpl implements ItemService {
     public CommentDto addComment(Long userId, Long itemId, Comment comment) {
         Item item = itemNotFound(itemId);
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new EntityNotFound("user c id " + userId + " не сущуствует"));
+                () -> new EntityNotFound("user with id " + userId + " was not found"));
         Booking booking = bookingRepository.findFirstByBookerAndItemOrderByStart(user, item);
         LocalDateTime now = LocalDateTime.now();
         if (booking == null) {
-            throw new BadComment("нельзя дать отзыв, если не брал данный товар");
+            throw new BadComment("couldn't give feedback as you didn't take item");
         }
         if (booking.getStart().isAfter(now.plusSeconds(1))) {
-            throw new BadComment("нельзя дать отзыв на будущую аренду");
+            throw new BadComment("couldn't give feedback on the future booking");
         }
         if (booking.getStatus().equals(State.APPROVED)) {
             comment.setUser(user);
@@ -121,13 +121,13 @@ public class ItemServiceImpl implements ItemService {
 
     @SneakyThrows
     private void checkExistUser(Long id) {
-        userRepository.findById(id).orElseThrow(() -> new EntityNotFound("user c id " + id + " не сущуствует"));
+        userRepository.findById(id).orElseThrow(() -> new EntityNotFound("user with id " + id + " was not found"));
     }
 
     @SneakyThrows
     private Item itemNotFound(Long itemId) {
         return repository.findById(itemId).orElseThrow(() ->
-                new EntityNotFound("item c id " + itemId + " не найден"));
+                new EntityNotFound("item with id " + itemId + " was not found"));
     }
 
     @SneakyThrows
@@ -143,7 +143,7 @@ public class ItemServiceImpl implements ItemService {
                 item.setAvailable(itemDto.getAvailable());
             }
         } else {
-            throw new EntityNotFound("user c id " + userId + " не совпадает с создателем item id " +
+            throw new EntityNotFound("user with id " + userId + " is not corresponded with owner of item id " +
                     item.getId());
         }
     }

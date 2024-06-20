@@ -29,14 +29,14 @@ public class ItemController {
         return service.add(userId, itemDto);
     }
 
-    @PatchMapping("/{itemId}")
+    @PatchMapping(Constants.PATH_ITEM_ID)
     public ItemDto update(@RequestHeader(Constants.HEADER) Long userId, @PathVariable Long itemId, @RequestBody ItemDto itemDto) {
         return service.update(userId, itemId, itemDto);
     }
 
-    @GetMapping("/{id}")
-    public ItemDto get(@RequestHeader(Constants.HEADER) Long userId, @PathVariable Long id) {
-        return service.get(userId, id);
+    @GetMapping(Constants.PATH_ITEM_ID)
+    public ItemDto get(@RequestHeader(Constants.HEADER) Long userId, @PathVariable Long itemId) {
+        return service.get(userId, itemId);
     }
 
     @GetMapping
@@ -49,7 +49,7 @@ public class ItemController {
         return service.search(word);
     }
 
-    @PostMapping("/{itemId}/comment")
+    @PostMapping(value = Constants.PATH_ITEM_ID + "/comment")
     public CommentDto addComment(@RequestHeader(Constants.HEADER) Long userId, @PathVariable Long itemId,
                                  @Valid @RequestBody Comment comment) {
         return service.addComment(userId, itemId, comment);

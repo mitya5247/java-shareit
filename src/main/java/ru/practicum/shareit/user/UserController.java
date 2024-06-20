@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.Constants;
 import ru.practicum.shareit.exceptions.EmailAlreadyExistsException;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -26,19 +27,19 @@ public class UserController {
         return service.create(user);
     }
 
-    @PatchMapping("/{userId}")
+    @PatchMapping(Constants.PATH_USER_ID)
     public User update(@PathVariable Long userId, @RequestBody User user) {
         return service.update(userId, user);
     }
 
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        service.delete(id);
+    @DeleteMapping(Constants.PATH_USER_ID)
+    public void delete(@PathVariable Long userId) {
+        service.delete(userId);
     }
 
-    @GetMapping("/{id}")
-    public User get(@PathVariable Long id) {
-        return service.get(id);
+    @GetMapping(Constants.PATH_USER_ID)
+    public User get(@PathVariable Long userId) {
+        return service.get(userId);
     }
 
     @GetMapping

@@ -32,14 +32,14 @@ public class UserServiceImpl implements UserService {
         User user1 = this.userNotFound(userId);
         this.fillFields(user1, user);
         repository.save(user1);
-        log.info("обновлен пользователь с id " + user.getId());
+        log.info("update user with id " + user.getId());
         return user1;
     }
 
     @Override
     public void delete(Long id) {
         User user = this.userNotFound(id);
-        log.info("удален пользователь с id " + id);
+        log.info("delete user with id " + id);
         repository.delete(user);
     }
 
@@ -56,14 +56,14 @@ public class UserServiceImpl implements UserService {
 
     @SneakyThrows
     private User userNotFound(Long id) {
-        return repository.findById(id).orElseThrow(() -> new EntityNotFound("user c id " + id + " не найден"));
+        return repository.findById(id).orElseThrow(() -> new EntityNotFound("user with id " + id + " was not found"));
     }
 
     @SneakyThrows
     private void checkEmailOnDuplicate(String email) {
         for (User user : this.getAll()) {
             if (user.getEmail().equals(email)) {
-                throw new EmailAlreadyExistsException("email " + email + " уже существует");
+                throw new EmailAlreadyExistsException("email " + email + " is already exists");
             }
         }
     }

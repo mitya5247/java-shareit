@@ -27,13 +27,13 @@ public class BookingController {
         return service.createRequest(userId, bookingDto);
     }
 
-    @PatchMapping("/{bookingId}")
+    @PatchMapping(Constants.PATH_BOOKING_ID)
     public BookingDtoResponse updateState(@RequestHeader(Constants.HEADER) Long userId, @PathVariable Long bookingId,
                         @RequestParam(name = "approved") String state) {
         return service.updateState(userId, bookingId, state);
     }
 
-    @GetMapping("/{bookingId}")
+    @GetMapping(Constants.PATH_BOOKING_ID)
     public BookingDtoResponse get(@RequestHeader(Constants.HEADER) Long userId, @PathVariable Long bookingId) {
         return service.get(userId, bookingId);
     }
