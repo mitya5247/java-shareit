@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.model;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.request.model.Request;
 
 import javax.persistence.*;
 import java.util.List;
@@ -37,4 +38,6 @@ public class Item {
     @OneToMany
     @JoinColumn(name = "item_id")
     List<Comment> comments;
+    @Column(name = "request_id")
+    Long requestId;
 }

@@ -24,6 +24,9 @@ public class Mapper {
         if (item.getNextBooking() != null) {
             itemDto.setNextBooking(Mapper.convertToBookingDto(item.getNextBooking()));
         }
+        if (item.getRequestId() != null) {
+            itemDto.setRequestId(item.getRequestId());
+        }
 
         List<CommentDto> commentDtoList = item.getComments().stream()
                 .map(comment -> Mapper.convertCommentToDto(comment))
@@ -43,6 +46,9 @@ public class Mapper {
         if (itemDto.getNextBooking() != null || itemDto.getLastBooking() != null) {
             item.setLastBooking(Mapper.convertToBooking(itemDto.getLastBooking()));
             item.setNextBooking(Mapper.convertToBooking(itemDto.getNextBooking()));
+        }
+        if (itemDto.getRequestId() != null) {
+            item.setRequestId(itemDto.getRequestId());
         }
         return item;
     }
