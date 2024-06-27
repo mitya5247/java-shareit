@@ -33,8 +33,8 @@ public class ItemRequestController {
     }
 
     @GetMapping("/all")
-    public List<Request> getAllRequests(@RequestHeader(Constants.HEADER) Long userId, @RequestParam Long from,
-                                        @RequestParam Long size) {
+    public List<Request> getAllRequests(@RequestHeader(Constants.HEADER) Long userId, @RequestParam(required = false) Long from,
+                                        @RequestParam(required = false) Long size) {
         return service.getAllRequest(userId, from, size);
     }
 

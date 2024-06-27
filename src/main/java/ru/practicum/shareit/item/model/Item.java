@@ -38,6 +38,7 @@ public class Item {
     @OneToMany
     @JoinColumn(name = "item_id")
     List<Comment> comments;
-    @Column(name = "request_id")
-    Long requestId;
+    @ManyToOne
+    @JoinColumn(name = "request_id")
+    Request request;
 }

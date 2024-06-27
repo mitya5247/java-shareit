@@ -2,6 +2,7 @@ package ru.practicum.shareit.request.model;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import ru.practicum.shareit.exceptions.NotEmptyDescription;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 
 import javax.persistence.*;

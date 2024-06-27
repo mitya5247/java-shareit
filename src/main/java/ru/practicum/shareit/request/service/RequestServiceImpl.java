@@ -2,20 +2,18 @@ package ru.practicum.shareit.request.service;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.EntityNotFound;
-import ru.practicum.shareit.handler.ErrorResponse;
+import ru.practicum.shareit.exceptions.NotEmptyDescription;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +22,7 @@ import java.util.List;
 @AllArgsConstructor
 public class RequestServiceImpl implements RequestService {
 
-    ItemRepository itemRepository;
+  //  ItemRepository itemRepository;
     UserRepository userRepository;
     RequestRepository requestRepository;
 
@@ -33,6 +31,7 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public Request create(Long userId, Request request) {
         User user = this.userNotFound(userId);
+        this.isEmptyDescription(request);
         request.setRequestor(userId);
         if (request.getItems() == null) {
             request.setItems(new ArrayList<>());
@@ -43,7 +42,11 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public List<Request> getRequestOfUser(Long userId) {
         User user = this.userNotFound(userId);
-        return requestRepository.findByRequestorOrderByCreatedDesc(userId);
+        List<Request> requests = requestRepository.findByRequestorOrderByCreatedDesc(userId);
+        for (Request request : requests) {
+            this.fillItemsRequestDto(request);
+        }
+        return requests;
     }
 
     @Override
@@ -61,8 +64,9 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public Request getOneRequest(Long userId, Long requestId) {
         User user = this.userNotFound(userId);
-
-        return this.requestNotFound(requestId);
+        Request request = this.requestNotFound(requestId);
+        this.fillItemsRequestDto(request);
+        return request;
     }
 
     @SneakyThrows
@@ -75,5 +79,17 @@ public class RequestServiceImpl implements RequestService {
     private Request requestNotFound(Long requestId) {
         return requestRepository.findById(requestId).orElseThrow(() ->
                 new EntityNotFound("request with id " + requestId + " was not found"));
+    }
+
+    private Request fillItemsRequestDto(Request request) {
+        request.setItems(requestRepository.findItems(request.getId()));
+        return request;
+    }
+
+    @SneakyThrows
+    private void isEmptyDescription(Request request) {
+        if (request.getDescription() == null || request.getDescription().isEmpty()) {
+            throw new NotEmptyDescription("descriptiom mustn't be null");
+        }
     }
 }
