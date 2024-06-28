@@ -2,10 +2,9 @@ package ru.practicum.shareit.request;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.Constants;
-import ru.practicum.shareit.handler.ErrorResponse;
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.service.RequestService;
 
@@ -33,8 +32,8 @@ public class ItemRequestController {
     }
 
     @GetMapping("/all")
-    public List<Request> getAllRequests(@RequestHeader(Constants.HEADER) Long userId, @RequestParam(required = false) Long from,
-                                        @RequestParam(required = false) Long size) {
+    public List<Request> getAllRequests(@RequestHeader(Constants.HEADER) Long userId, @RequestParam(required = false,
+            defaultValue = "0") Long from, @RequestParam(required = false, defaultValue = "10") Long size) {
         return service.getAllRequest(userId, from, size);
     }
 

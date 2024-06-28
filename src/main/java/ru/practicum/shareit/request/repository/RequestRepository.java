@@ -1,5 +1,8 @@
 package ru.practicum.shareit.request.repository;
 
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -14,4 +17,6 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
     @Query(value = "select new ru.practicum.shareit.request.dto.ItemRequestDto(i.id, i.name, i.description, " +
             "i.request.id, i.available) from Item as i where i.request.id = :requestId order by i.request.created desc")
     List<ItemRequestDto> findItems(Long requestId);
+
+ //   List<Request> findAll(Pageable pageable);
 }
