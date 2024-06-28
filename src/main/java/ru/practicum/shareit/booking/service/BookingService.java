@@ -13,8 +13,8 @@ public interface BookingService {
 
     BookingDtoResponse get(Long userId, Long bookingId); // получение данных о конкретном бронировании только со стороны owner item или booker
 
-    List<BookingDtoResponse> getAllUserBookings(Long userId, String state); // список бронирования вещей, которые забронил user
+    List<BookingDtoResponse> getAllUserBookings(Long userId, String state, Long from, Long size); // список бронирования вещей, которые забронил user
 
-    List<BookingDtoResponse> getAllItemsBooked(Long userId, String state); // список забронированных вещей user-a
+    List<BookingDtoResponse> getAllItemsBooked(Long userId, String state, Long from, Long size); // список забронированных вещей user-a
 
 }

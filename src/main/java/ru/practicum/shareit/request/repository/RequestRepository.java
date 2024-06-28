@@ -18,5 +18,4 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
             "i.request.id, i.available) from Item as i where i.request.id = :requestId order by i.request.created desc")
     List<ItemRequestDto> findItems(Long requestId);
 
- //   List<Request> findAll(Pageable pageable);
 }
