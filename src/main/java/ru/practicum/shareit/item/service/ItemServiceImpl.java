@@ -59,7 +59,8 @@ public class ItemServiceImpl implements ItemService {
             item.setRequest(request);
         }
         item.setComments(comments);
-        return Mapper.convertToDto(repository.save(item));
+        item = repository.save(item);
+        return Mapper.convertToDto(item);
     }
 
     @Override

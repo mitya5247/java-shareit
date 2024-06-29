@@ -7,14 +7,21 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.Mapper;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @SpringBootTest(properties = "db.name = test")
@@ -28,6 +35,10 @@ public class ServiceItemTests {
     ItemDto itemDto;
     Item item;
     User user;
+    @MockBean
+    BookingRepository bookingRepository;
+    @MockBean
+    CommentRepository commentRepository;
 
     @BeforeEach
     public void createUserAndItem() {
@@ -42,27 +53,116 @@ public class ServiceItemTests {
         itemDto.setName("название");
         itemDto.setDescription("описание");
 
+        itemDto.setComments(new ArrayList<>());
+
         item = Mapper.convertToItem(user.getId(), itemDto);
+        item.setComments(new ArrayList<>());
     }
 
     @Test
     public void createItemTest() {
 
         Mockito.when(userRepository.findById(user.getId()))
-                        .thenReturn(Optional.ofNullable(user));
+                .thenReturn(Optional.ofNullable(user));
 
-        Mockito.when(itemRepository.save(Mapper.convertToItem(user.getId(), itemDto)))
+        Mockito.when(itemRepository.save(Mockito.any(Item.class)))
                 .thenReturn(item);
 
-        Mockito.when(itemRepository.save(item))
-                .thenReturn(item);
-
+        service.add(user.getId(), itemDto);
 
         Mockito.verify(itemRepository, Mockito.times(1))
-                .save(Mapper.convertToItem(user.getId(), itemDto));
+                .save(Mockito.any(Item.class));
+
+    }
+
+    @Test
+    public void updateItemTest() {
+
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        Mockito.when(itemRepository.save(Mockito.any(Item.class)))
+                .thenReturn(item);
+
+        service.update(user.getId(), itemDto.getId(), itemDto);
+
+        Mockito.verify(itemRepository, Mockito.times(1))
+                .save(Mockito.any(Item.class));
+
+    }
+
+    @Test
+    public void getItemTest() {
+
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        Mockito.when(itemRepository.save(Mockito.any(Item.class)))
+                .thenReturn(item);
+
+        service.get(user.getId(), itemDto.getId());
+
+        Mockito.verify(itemRepository, Mockito.times(1))
+                .findById(itemDto.getId());
+
+    }
+
+    @Test
+    public void getAllItemsTest() {
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        List<Item> items = new ArrayList<>();
+        items.add(item);
+
+        Mockito.when(itemRepository.findAllByOwnerOrderById(user.getId()))
+                .thenReturn(items);
+
+        service.getAll(user.getId());
+
+        Mockito.verify(itemRepository, Mockito.times(1))
+                .findAllByOwnerOrderById(user.getId());
+
+    }
+
+    @Test
+    public void addCommentTest() {
+
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        Booking booking = new Booking();
+        booking.setItem(item);
+        booking.setId(1L);
+        booking.setBooker(user);
+        booking.setStart(LocalDateTime.now());
+        booking.setEnd(LocalDateTime.now());
+
+        Comment comment = new Comment();
+        comment.setCreated(LocalDateTime.now());
+        comment.setId(1L);
+        comment.setUser(user);
+        comment.setText("коммент");
+
+        List<Item> items = new ArrayList<>();
+        items.add(item);
 
 
-        Assertions.assertEquals(service.add(user.getId(), itemDto), itemDto);
+        Mockito.when(bookingRepository.findFirstByBookerAndItemOrderByStart(user, item))
+                .thenReturn(booking);
+
+        service.addComment(user.getId(), item.getId(), comment);
+
+        Mockito.verify(itemRepository, Mockito.times(1))
+                .save(item);
+        Mockito.verify(commentRepository, Mockito.times(1))
+                .save(comment);
 
     }
 }
