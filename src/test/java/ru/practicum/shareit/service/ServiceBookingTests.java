@@ -15,6 +15,8 @@ import ru.practicum.shareit.booking.State;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.exceptions.EntityNotFound;
+import ru.practicum.shareit.exceptions.UnknownState;
 import ru.practicum.shareit.item.Mapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
@@ -22,6 +24,7 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,6 +94,40 @@ public class ServiceBookingTests {
     }
 
     @Test
+    public void createBookingWithUnknownUserTest() {
+
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        User user1 = new User();
+        user1.setId(2L);
+        user1.setName("name");
+        user1.setEmail("new@mail.ru");
+
+        bookingDto.setStart(LocalDateTime.now().plusSeconds(1));
+        bookingDto.setEnd(LocalDateTime.now().plusSeconds(1));
+
+        Assertions.assertThrows(EntityNotFoundException.class, () -> service.createRequest(user.getId(), bookingDto));
+    }
+
+    @Test
+    public void createBookingWithUnknownItemTest() {
+
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+
+        User user1 = new User();
+        user1.setId(2L);
+        user1.setName("name");
+        user1.setEmail("new@mail.ru");
+
+        bookingDto.setStart(LocalDateTime.now().plusSeconds(1));
+        bookingDto.setEnd(LocalDateTime.now().plusSeconds(1));
+
+        Assertions.assertThrows(EntityNotFound.class, () -> service.createRequest(user.getId(), bookingDto));
+    }
+
+    @Test
     public void updateBookingStateTest() {
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(booking));
@@ -154,6 +191,20 @@ public class ServiceBookingTests {
 
         Mockito.verify(bookingRepository, Mockito.times(1))
                 .findAllByItemInOrderByStartDesc(items, PageRequest.of(0, 10));
+
+    }
+
+    @Test
+    public void getBookingByUnknownStateTest() {
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        Assertions.assertThrows(UnknownState.class, () ->
+                service.getAllUserBookings(user.getId(), "UNKNOWN", 0L ,10L));
 
     }
 }

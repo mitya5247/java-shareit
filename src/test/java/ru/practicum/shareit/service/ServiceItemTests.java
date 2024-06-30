@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.exceptions.EntityNotFound;
 import ru.practicum.shareit.item.Mapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Comment;
@@ -76,6 +77,14 @@ public class ServiceItemTests {
     }
 
     @Test
+    public void createItemByUnknownUserTest() {
+
+        Assertions.assertThrows(EntityNotFound.class, () -> service.add(user.getId(), itemDto));
+
+    }
+
+
+    @Test
     public void updateItemTest() {
 
         Mockito.when(userRepository.findById(Mockito.anyLong()))
@@ -109,6 +118,16 @@ public class ServiceItemTests {
                 .findById(itemDto.getId());
 
     }
+
+    @Test
+    public void getUnknownItemTest() {
+
+        Assertions.assertThrows(EntityNotFound.class, () -> service.get(user.getId(), 100L));
+        Mockito.verify(itemRepository, Mockito.times(1))
+                .findById(Mockito.anyLong());
+    }
+
+
 
     @Test
     public void getAllItemsTest() {
@@ -164,5 +183,14 @@ public class ServiceItemTests {
         Mockito.verify(commentRepository, Mockito.times(1))
                 .save(comment);
 
+    }
+
+    @Test
+    public void searchItemTest() {
+
+        service.search("name");
+
+        Mockito.verify(itemRepository, Mockito.times(1))
+                .findAllByNameOrDescriptionContainingIgnoreCase(Mockito.anyString(), Mockito.anyString());
     }
 }

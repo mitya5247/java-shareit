@@ -65,7 +65,7 @@ public class RequestServiceImpl implements RequestService {
         int sizeInt = Integer.parseInt(String.valueOf(size));
         int fromInt = Integer.parseInt(String.valueOf(from));
         Pageable page = PageRequest.of(fromInt, sizeInt, Sort.by("created").descending());
-        List<Request> requests = requestRepository.findAll(page).toList().stream()
+        List<Request> requests = requestRepository.findAll(page).toList().stream() // null из-за page
                 .filter(request -> !request.getRequestor().equals(userId))
                 .map(request -> this.fillItemsRequestDto(request, userId))
                 .collect(Collectors.toList());
