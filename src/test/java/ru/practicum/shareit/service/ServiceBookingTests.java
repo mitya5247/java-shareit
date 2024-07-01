@@ -3,7 +3,6 @@ package ru.practicum.shareit.service;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,7 +10,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.Booking;
-import ru.practicum.shareit.booking.State;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingService;
@@ -172,6 +170,108 @@ public class ServiceBookingTests {
     }
 
     @Test
+    public void getCURRENTUserBookingsTest() {
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        service.getAllUserBookings(user.getId(), "CURRENT", 0L ,10L);
+
+        Mockito.verify(bookingRepository, Mockito.times(1))
+                .findAllByBookerAndStartBeforeAndEndAfterOrderByStartAsc(Mockito.any(User.class), Mockito.any(LocalDateTime.class),
+                        Mockito.any(LocalDateTime.class), Mockito.any(Pageable.class));
+
+    }
+
+    @Test
+    public void getFUTUREUserBookingsTest() {
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        service.getAllUserBookings(user.getId(), "FUTURE", 0L ,10L);
+
+        Mockito.verify(bookingRepository, Mockito.times(1))
+                .findAllByBookerAndEndAfterOrderByStartDesc(Mockito.any(User.class), Mockito.any(LocalDateTime.class),
+                        Mockito.any(Pageable.class));
+
+    }
+
+    @Test
+    public void getPASTUserBookingsTest() {
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        service.getAllUserBookings(user.getId(), "PAST", 0L ,10L);
+
+        Mockito.verify(bookingRepository, Mockito.times(1))
+                .findAllByBookerAndEndBeforeOrderByStartDesc(Mockito.any(User.class), Mockito.any(LocalDateTime.class),
+                        Mockito.any(Pageable.class));
+
+    }
+
+    @Test
+    public void getAPPROVEDUserBookingsTest() {
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        service.getAllUserBookings(user.getId(), "APPROVED", 0L ,10L);
+
+        Mockito.verify(bookingRepository, Mockito.times(1))
+                .findAllByStatusAndBookerOrderByStartDesc(Mockito.any(), Mockito.any(User.class),
+                        Mockito.any(Pageable.class));
+
+    }
+
+    @Test
+    public void getREJECTEDUserBookingsTest() {
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        service.getAllUserBookings(user.getId(), "REJECTED", 0L ,10L);
+
+        Mockito.verify(bookingRepository, Mockito.times(1))
+                .findAllByStatusAndBookerOrderByStartDesc(Mockito.any(), Mockito.any(User.class),
+                        Mockito.any(Pageable.class));
+
+    }
+
+    @Test
+    public void getWAITINGUserBookingsTest() {
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        service.getAllUserBookings(user.getId(), "WAITING", 0L ,10L);
+
+        Mockito.verify(bookingRepository, Mockito.times(1))
+                .findAllByStatusAndBookerOrderByStartDesc(Mockito.any(), Mockito.any(User.class),
+                        Mockito.any(Pageable.class));
+
+    }
+
+    @Test
     public void getAllItemsBookedTest() {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
@@ -191,6 +291,121 @@ public class ServiceBookingTests {
 
         Mockito.verify(bookingRepository, Mockito.times(1))
                 .findAllByItemInOrderByStartDesc(items, PageRequest.of(0, 10));
+
+    }
+
+    @Test
+    public void getPASTItemsBookedTest() {
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        List<Item> items = new ArrayList<>();
+
+        items.add(item);
+
+        Mockito.when(itemRepository.findAllByOwnerOrderById(Mockito.anyLong()))
+                .thenReturn(items);
+
+        service.getAllItemsBooked(user.getId(), "PAST", 0L ,10L);
+
+        Mockito.verify(bookingRepository, Mockito.times(1))
+                .findAllByItemInAndEndBeforeOrderByStartDesc(Mockito.anyList(), Mockito.any(LocalDateTime.class), Mockito.any(Pageable.class));
+
+    }
+
+    @Test
+    public void getFUTUREItemsBookedTest() {
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        List<Item> items = new ArrayList<>();
+
+        items.add(item);
+
+        Mockito.when(itemRepository.findAllByOwnerOrderById(Mockito.anyLong()))
+                .thenReturn(items);
+
+        service.getAllItemsBooked(user.getId(), "FUTURE", 0L ,10L);
+
+        Mockito.verify(bookingRepository, Mockito.times(1))
+                .findAllByItemInAndEndAfterOrderByStartDesc(Mockito.anyList(), Mockito.any(LocalDateTime.class), Mockito.any(Pageable.class));
+
+    }
+
+    @Test
+    public void getAPPROVEDItemsBookedTest() {
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        List<Item> items = new ArrayList<>();
+
+        items.add(item);
+
+        Mockito.when(itemRepository.findAllByOwnerOrderById(Mockito.anyLong()))
+                .thenReturn(items);
+
+        service.getAllItemsBooked(user.getId(), "APPROVED", 0L ,10L);
+
+        Mockito.verify(bookingRepository, Mockito.times(1))
+                .findAllByStatusAndItemInOrderByStartDesc(Mockito.any(), Mockito.anyList(), Mockito.any(Pageable.class));
+
+    }
+
+    @Test
+    public void getREJECTEDItemsBookedTest() {
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        List<Item> items = new ArrayList<>();
+
+        items.add(item);
+
+        Mockito.when(itemRepository.findAllByOwnerOrderById(Mockito.anyLong()))
+                .thenReturn(items);
+
+        service.getAllItemsBooked(user.getId(), "REJECTED", 0L ,10L);
+
+        Mockito.verify(bookingRepository, Mockito.times(1))
+                .findAllByStatusAndItemInOrderByStartDesc(Mockito.any(), Mockito.anyList(), Mockito.any(Pageable.class));
+
+    }
+
+    @Test
+    public void getWAITINGItemsBookedTest() {
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        List<Item> items = new ArrayList<>();
+
+        items.add(item);
+
+        Mockito.when(itemRepository.findAllByOwnerOrderById(Mockito.anyLong()))
+                .thenReturn(items);
+
+        service.getAllItemsBooked(user.getId(), "WAITING", 0L ,10L);
+
+        Mockito.verify(bookingRepository, Mockito.times(1))
+                .findAllByStatusAndItemInOrderByStartDesc(Mockito.any(), Mockito.anyList(), Mockito.any(Pageable.class));
 
     }
 

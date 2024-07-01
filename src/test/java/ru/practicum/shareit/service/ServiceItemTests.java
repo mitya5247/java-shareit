@@ -187,8 +187,15 @@ public class ServiceItemTests {
 
     @Test
     public void searchItemTest() {
+        List<Item> items = new ArrayList<>();
+        items.add(item);
 
-        service.search("name");
+        List<ItemDto> itemDtos = new ArrayList<>();
+        itemDtos.add(itemDto);
+        Mockito.when(itemRepository.findAllByNameOrDescriptionContainingIgnoreCase(Mockito.anyString(), Mockito.anyString()))
+                        .thenReturn(items);
+
+        service.search("описание");
 
         Mockito.verify(itemRepository, Mockito.times(1))
                 .findAllByNameOrDescriptionContainingIgnoreCase(Mockito.anyString(), Mockito.anyString());
