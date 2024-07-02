@@ -95,9 +95,42 @@ public class BookingRepositoryTests {
     }
 
     @Test
-    public void findAllByStatusAndBookerTest() {
+    public void findAllByStatusWAITINGAndBookerTest() {
 
         List<Booking> bookings = bookingRepository.findAllByStatusAndBookerOrderByStartDesc(State.WAITING, user,
+                PageRequest.of(0, 10));
+
+        Assertions.assertEquals(bookingId, bookings.get(0).getId());
+        Assertions.assertEquals(booking.getItem().getId(), bookings.get(0).getItem().getId());
+        Assertions.assertEquals(booking.getEnd(), bookings.get(0).getEnd());
+        Assertions.assertEquals(booking.getStart(), bookings.get(0).getStart());
+        Assertions.assertEquals(booking.getBooker(), bookings.get(0).getBooker());
+
+    }
+
+    @Test
+    public void findAllByStatusAPPROVEDAndBookerTest() {
+
+        booking.setStatus(State.APPROVED);
+        bookingRepository.save(booking);
+        List<Booking> bookings = bookingRepository.findAllByStatusAndBookerOrderByStartDesc(State.APPROVED, user,
+                PageRequest.of(0, 10));
+
+        Assertions.assertEquals(bookingId, bookings.get(0).getId());
+        Assertions.assertEquals(booking.getItem().getId(), bookings.get(0).getItem().getId());
+        Assertions.assertEquals(booking.getEnd(), bookings.get(0).getEnd());
+        Assertions.assertEquals(booking.getStart(), bookings.get(0).getStart());
+        Assertions.assertEquals(booking.getBooker(), bookings.get(0).getBooker());
+
+    }
+
+
+    @Test
+    public void findAllByStatusREJECTEDAndBookerTest() {
+
+        booking.setStatus(State.REJECTED);
+        bookingRepository.save(booking);
+        List<Booking> bookings = bookingRepository.findAllByStatusAndBookerOrderByStartDesc(State.REJECTED, user,
                 PageRequest.of(0, 10));
 
         Assertions.assertEquals(bookingId, bookings.get(0).getId());
@@ -151,7 +184,7 @@ public class BookingRepositoryTests {
     }
 
     @Test
-    public void findAllByBookerAndStartBeforeAndEndAfterOrderByStartAscTest() { // метод поправить
+    public void findAllByBookerAndStartBeforeAndEndAfterOrderByStartAscTest() {
 
         List<Booking> bookings = bookingRepository.findAllByBookerAndStartBeforeAndEndAfterOrderByStartAsc(user, LocalDateTime.now().plusHours(12),
                 LocalDateTime.now().plusSeconds(2), PageRequest.of(0, 10));
@@ -161,6 +194,117 @@ public class BookingRepositoryTests {
         Assertions.assertEquals(booking.getEnd(), bookings.get(0).getEnd());
         Assertions.assertEquals(booking.getStart(), bookings.get(0).getStart());
         Assertions.assertEquals(booking.getBooker(), bookings.get(0).getBooker());
+
+    }
+
+    @Test
+    public void findFirstByBookerAndItemOrderByStartTest() {
+
+        Booking booking1 = bookingRepository.findFirstByBookerAndItemOrderByStart(user, item);
+
+        Assertions.assertEquals(bookingId, booking1.getId());
+        Assertions.assertEquals(booking.getItem().getId(), booking1.getItem().getId());
+        Assertions.assertEquals(booking.getEnd(), booking1.getEnd());
+        Assertions.assertEquals(booking.getStart(), booking1.getStart());
+        Assertions.assertEquals(booking.getBooker(), booking1.getBooker());
+
+    }
+
+    @Test
+    public void findAllByStatusAndItemTest() {
+
+        List<Item> items = new ArrayList<>();
+        items.add(item);
+
+        List<Booking> bookings = bookingRepository.findAllByStatusAndItemInOrderByStartDesc(State.WAITING, items,
+                PageRequest.of(0, 10));
+
+        Assertions.assertEquals(bookingId, bookings.get(0).getId());
+        Assertions.assertEquals(booking.getItem().getId(), bookings.get(0).getItem().getId());
+        Assertions.assertEquals(booking.getEnd(), bookings.get(0).getEnd());
+        Assertions.assertEquals(booking.getStart(), bookings.get(0).getStart());
+        Assertions.assertEquals(booking.getBooker(), bookings.get(0).getBooker());
+
+    }
+
+    @Test
+    public void findAllByItemInAndEndAfterOrderByStartDescTest() {
+
+        List<Item> items = new ArrayList<>();
+        items.add(item);
+
+        List<Booking> bookings = bookingRepository.findAllByItemInAndEndAfterOrderByStartDesc(items, LocalDateTime.now(),
+                PageRequest.of(0, 10));
+
+        Assertions.assertEquals(bookingId, bookings.get(0).getId());
+        Assertions.assertEquals(booking.getItem().getId(), bookings.get(0).getItem().getId());
+        Assertions.assertEquals(booking.getEnd(), bookings.get(0).getEnd());
+        Assertions.assertEquals(booking.getStart(), bookings.get(0).getStart());
+        Assertions.assertEquals(booking.getBooker(), bookings.get(0).getBooker());
+
+    }
+
+    @Test
+    public void findAllByItemInAndEndBeforeOrderByStartDescTest() {
+
+        List<Item> items = new ArrayList<>();
+        items.add(item);
+
+        List<Booking> bookings = bookingRepository.findAllByItemInAndEndBeforeOrderByStartDesc(items, LocalDateTime.now()
+                        .plusMonths(1), PageRequest.of(0, 10));
+
+        Assertions.assertEquals(bookingId, bookings.get(0).getId());
+        Assertions.assertEquals(booking.getItem().getId(), bookings.get(0).getItem().getId());
+        Assertions.assertEquals(booking.getEnd(), bookings.get(0).getEnd());
+        Assertions.assertEquals(booking.getStart(), bookings.get(0).getStart());
+        Assertions.assertEquals(booking.getBooker(), bookings.get(0).getBooker());
+
+    }
+
+    @Test
+    public void findAllByItemInOrderByStartDescTest() {
+
+        List<Item> items = new ArrayList<>();
+        items.add(item);
+
+        List<Booking> bookings = bookingRepository.findAllByItemInOrderByStartDesc(items, PageRequest.of(0, 10));
+
+        Assertions.assertEquals(bookingId, bookings.get(0).getId());
+        Assertions.assertEquals(booking.getItem().getId(), bookings.get(0).getItem().getId());
+        Assertions.assertEquals(booking.getEnd(), bookings.get(0).getEnd());
+        Assertions.assertEquals(booking.getStart(), bookings.get(0).getStart());
+        Assertions.assertEquals(booking.getBooker(), bookings.get(0).getBooker());
+
+    }
+
+    @Test
+    public void findAllByItemInAndStartBeforeAndEndAfterOrderByStartDescTest() {
+
+        List<Item> items = new ArrayList<>();
+        items.add(item);
+
+        List<Booking> bookings = bookingRepository.findAllByItemInAndStartBeforeAndEndAfterOrderByStartDesc(items,
+                LocalDateTime.now().plusHours(12), LocalDateTime.now(), PageRequest.of(0, 10));
+
+        Assertions.assertEquals(bookingId, bookings.get(0).getId());
+        Assertions.assertEquals(booking.getItem().getId(), bookings.get(0).getItem().getId());
+        Assertions.assertEquals(booking.getEnd(), bookings.get(0).getEnd());
+        Assertions.assertEquals(booking.getStart(), bookings.get(0).getStart());
+        Assertions.assertEquals(booking.getBooker(), bookings.get(0).getBooker());
+
+    }
+
+    @Test
+    public void findFirstByItemAndStartBetweenOrderByStartDescTest() {
+
+        Booking booking1 = bookingRepository.findFirstByItemAndStartBetweenOrderByStartDesc(item,
+                LocalDateTime.now().minusHours(1), LocalDateTime.now().plusHours(1));
+
+        Assertions.assertEquals(bookingId, booking1.getId());
+        Assertions.assertEquals(booking.getItem().getId(), booking1.getItem().getId());
+        Assertions.assertEquals(booking.getEnd(), booking1.getEnd());
+        Assertions.assertEquals(booking.getStart(), booking1.getStart());
+        Assertions.assertEquals(booking.getBooker(), booking1.getBooker());
 
     }
 

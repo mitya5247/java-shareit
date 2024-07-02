@@ -8,9 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import ru.practicum.shareit.item.Mapper;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -19,7 +22,11 @@ import java.util.ArrayList;
 @DataJpaTest(properties = "db.name = test")
 public class ItemRepositoryTests {
     @Autowired
-    ItemRepository repository;
+    ItemRepository itemRepository;
+    @Autowired
+    CommentRepository commentRepository;
+    @Autowired
+    UserRepository userRepository;
     @Autowired
     EntityManager em;
     User user;
@@ -32,11 +39,11 @@ public class ItemRepositoryTests {
     @BeforeEach
     public void initUser() {
         user = new User();
-        user.setId(1L);
         user.setEmail("email@name.ru");
         user.setName("name");
 
-        userId = user.getId();
+        userId = userRepository.save(user).getId();
+        user.setId(userId);
 
         itemDto = new ItemDto();
         itemDto.setId(1L);
@@ -48,7 +55,7 @@ public class ItemRepositoryTests {
 
         item = Mapper.convertToItem(user.getId(), itemDto);
         item.setComments(new ArrayList<>());
-        itemId = repository.save(item).getId();
+        itemId = itemRepository.save(item).getId();
     }
 
     @Test
@@ -64,7 +71,7 @@ public class ItemRepositoryTests {
     @Test
     public void update() {
         item.setName("Новое имя");
-        itemId = repository.save(item).getId();
+        itemId = itemRepository.save(item).getId();
         TypedQuery<Item> query = em.createQuery("select i from Item i where i.id = :id", Item.class)
                 .setParameter("id", itemId);
         Item item1 = query.getSingleResult();
@@ -75,7 +82,7 @@ public class ItemRepositoryTests {
 
     @Test
     public void get() {
-        repository.save(item);
+        itemRepository.save(item);
         TypedQuery<Item> query = em.createQuery("select i from Item i where i.id = :id", Item.class)
                 .setParameter("id", itemId);
         Item item1 = query.getSingleResult();
@@ -84,9 +91,41 @@ public class ItemRepositoryTests {
         Assertions.assertEquals(item.getDescription() , item1.getDescription());
     }
 
+    @Test
+    public void addComment() {
+
+        Comment comment = new Comment();
+        comment.setUser(user);
+        comment.setText("коммент");
+
+        Long commentId = commentRepository.save(comment).getId();
+        TypedQuery<Comment> query = em.createQuery("select c from Comment c where c.id = :id", Comment.class)
+                .setParameter("id", commentId);
+        Comment comment1 = query.getSingleResult();
+        Assertions.assertEquals(commentId , comment1.getId());
+        Assertions.assertEquals(comment.getText() , comment1.getText());
+        Assertions.assertEquals(comment.getUser() , comment1.getUser());
+    }
+
+    @Test
+    public void findByIdCommentTest() {
+
+        Comment comment = new Comment();
+        comment.setUser(user);
+        comment.setText("коммент");
+
+        Long commentId = commentRepository.save(comment).getId();
+        Comment comment1 = commentRepository.findById(commentId).get();
+        Assertions.assertEquals(commentId , comment1.getId());
+        Assertions.assertEquals(comment.getText() , comment1.getText());
+        Assertions.assertEquals(comment.getUser() , comment1.getUser());
+    }
+
     @AfterEach
     public void delete() {
-        repository.deleteAll();
+        commentRepository.deleteAll();
+        itemRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
 }
