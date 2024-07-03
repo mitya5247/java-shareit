@@ -23,7 +23,7 @@ public class UserServiceImpl implements UserService {
     UserRepository repository;
 
     @Override
-    public User create(User user) throws EmailAlreadyExistsException {
+    public User create(User user) {
         return repository.save(user);
     }
 

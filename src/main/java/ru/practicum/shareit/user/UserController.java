@@ -23,7 +23,7 @@ public class UserController {
     final UserService service;
 
     @PostMapping
-    public User create(@Valid @RequestBody User user) throws EmailAlreadyExistsException {
+    public User create(@Valid @RequestBody User user) {
         return service.create(user);
     }
 
