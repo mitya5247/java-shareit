@@ -8,6 +8,7 @@ import ru.practicum.shareit.booking.State;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 
 /**
@@ -19,9 +20,9 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode
 public class BookingDto {
     Long id;
-    @NotNull(message = "booker must not be null")
+    @Positive(message = "booker must not be negative or zero")
     Long bookerId;
-    @NotNull(message = "itemId must not be null")
+    @Positive(message = "itemId must not be negative or zero")
     Long itemId;
     @Enumerated(EnumType.STRING)
     State status = State.WAITING;

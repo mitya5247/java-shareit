@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.service.BookingService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -23,7 +24,7 @@ public class BookingController {
     BookingService service;
 
     @PostMapping
-    public BookingDtoResponse createRequest(@RequestHeader(Constants.HEADER) Long userId, @RequestBody BookingDto bookingDto) {
+    public BookingDtoResponse createRequest(@RequestHeader(Constants.HEADER) Long userId,@Valid @RequestBody BookingDto bookingDto) {
         return service.createRequest(userId, bookingDto);
     }
 

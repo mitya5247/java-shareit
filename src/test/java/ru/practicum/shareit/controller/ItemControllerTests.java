@@ -1,6 +1,5 @@
 package ru.practicum.shareit.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,23 +8,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.format.datetime.DateFormatter;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.Constants;
 import ru.practicum.shareit.item.ItemController;
 import ru.practicum.shareit.item.Mapper;
-import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.User;
-import ru.practicum.shareit.user.service.UserService;
 
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,9 +29,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(ItemController.class)
 public class ItemControllerTests {
-
-    @Autowired
-    Jackson2ObjectMapperBuilderCustomizer customizer ;
 
     @Autowired
     MockMvc mvc;
@@ -195,5 +185,105 @@ public class ItemControllerTests {
                 .andExpect(jsonPath("$.id", is(Integer.parseInt(String.valueOf(comment.getId())))))
                 .andExpect(jsonPath("$.authorName", is(comment.getUser().getName())))
                 .andExpect(jsonPath("$.text", is(comment.getText())));
+    }
+
+    @Test
+    public void createItemWithEmptyNameTest() throws Exception {
+
+        itemDto.setName("");
+
+        Mockito.when(itemService.add(Mockito.anyLong(), Mockito.any(ItemDto.class)))
+                .thenReturn(itemDto);
+
+        String json = mapper.writeValueAsString(itemDto);
+
+        mvc.perform(post("/items")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .header(Constants.HEADER, user.getId())
+                        .content(json)
+                        .queryParam("text", itemDto.getName()))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void createItemWithNullNameTest() throws Exception {
+
+        itemDto.setName(null);
+
+        Mockito.when(itemService.add(Mockito.anyLong(), Mockito.any(ItemDto.class)))
+                .thenReturn(itemDto);
+
+        String json = mapper.writeValueAsString(itemDto);
+
+        mvc.perform(post("/items")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .header(Constants.HEADER, user.getId())
+                        .content(json)
+                        .queryParam("text", itemDto.getName()))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void createItemWithEmptyDescriptionTest() throws Exception {
+
+        itemDto.setDescription("");
+
+        Mockito.when(itemService.add(Mockito.anyLong(), Mockito.any(ItemDto.class)))
+                .thenReturn(itemDto);
+
+        String json = mapper.writeValueAsString(itemDto);
+
+        mvc.perform(post("/items")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .header(Constants.HEADER, user.getId())
+                        .content(json)
+                        .queryParam("text", itemDto.getName()))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void createItemWithNullDescriptionTest() throws Exception {
+
+        itemDto.setDescription(null);
+
+        Mockito.when(itemService.add(Mockito.anyLong(), Mockito.any(ItemDto.class)))
+                .thenReturn(itemDto);
+
+        String json = mapper.writeValueAsString(itemDto);
+
+        mvc.perform(post("/items")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .header(Constants.HEADER, user.getId())
+                        .content(json)
+                        .queryParam("text", itemDto.getName()))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void createItemWithNullAvailableTest() throws Exception {
+
+        itemDto.setAvailable(null);
+
+        Mockito.when(itemService.add(Mockito.anyLong(), Mockito.any(ItemDto.class)))
+                .thenReturn(itemDto);
+
+        String json = mapper.writeValueAsString(itemDto);
+
+        mvc.perform(post("/items")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .header(Constants.HEADER, user.getId())
+                        .content(json)
+                        .queryParam("text", itemDto.getName()))
+                .andExpect(status().isBadRequest());
     }
 }

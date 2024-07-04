@@ -8,6 +8,7 @@ import ru.practicum.shareit.request.dto.ItemRequestDto;
 import javax.persistence.*;
 import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,6 +25,7 @@ public class Request {
     @NotEmpty(message = "description musnt't be empty")
     @Column(name = "description")
     String description;
+    @Positive(message = "requestor musn't be negative")
     @Column(name = "requestor_id")
     Long requestor;
     @Transient

@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
@@ -29,9 +30,10 @@ public class User {
     Long id;
     @Column(name = "email", unique = true)
     @Email
-    @NotNull(message = "email must not be null")
+    @NotEmpty(message = "email must not be null or empty")
     String email;
     @Column(name = "name")
+    @NotEmpty(message = "name must not be null or empty")
     String name;
 
 }

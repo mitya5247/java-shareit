@@ -1,11 +1,13 @@
 package ru.practicum.shareit.json;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
+import org.springframework.boot.test.json.ObjectContent;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -62,6 +64,22 @@ public class JsonBookingTests {
         assertThat(content).extractingJsonPathValue("$.start", bookingDtoResponse.getStart());
         assertThat(content).extractingJsonPathValue("$.end", bookingDtoResponse.getEnd());
 
+    }
+
+    @Test
+    public void deSerializeBookingDtoResponse() throws IOException {
+        JsonContent<BookingDtoResponse> content = tester.write(bookingDtoResponse);
+
+        ObjectContent<BookingDtoResponse> objectContent = tester.parse(content.getJson());
+
+        BookingDtoResponse bookingDtoResponse1 = objectContent.getObject();
+
+        Assertions.assertEquals(bookingDtoResponse.getId(), bookingDtoResponse1.getId());
+        Assertions.assertEquals(bookingDtoResponse.getBooker(), bookingDtoResponse1.getBooker());
+        Assertions.assertEquals(bookingDtoResponse.getStatus(), bookingDtoResponse1.getStatus());
+        Assertions.assertEquals(bookingDtoResponse.getItem(), bookingDtoResponse1.getItem());
+        Assertions.assertEquals(bookingDtoResponse.getStart(), bookingDtoResponse1.getStart());
+        Assertions.assertEquals(bookingDtoResponse.getEnd(), bookingDtoResponse1.getEnd());
     }
 
 

@@ -177,7 +177,7 @@ public class BookingServiceImpl implements BookingService {
     private List<Booking> chooseRequest(User user, State state, Long from, Long size) {
         int fromInt = Integer.parseInt(from.toString());
         int sizeInt = Integer.parseInt(size.toString());
-        Pageable page = PageRequest.of(fromInt, sizeInt);
+        Pageable page = PageRequest.of(fromInt/sizeInt, sizeInt);
         if (state == null) {
             state = State.ALL;
         }
@@ -206,7 +206,7 @@ public class BookingServiceImpl implements BookingService {
     private List<Booking> chooseRequestForOwner(List<Item> items, State state, Long from, Long size) {
         int fromInt = Integer.parseInt(from.toString());
         int sizeInt = Integer.parseInt(size.toString());
-        Pageable page = PageRequest.of(fromInt, sizeInt);
+        Pageable page = PageRequest.of(fromInt/sizeInt, sizeInt);
 
         switch (state) {
             case CURRENT:

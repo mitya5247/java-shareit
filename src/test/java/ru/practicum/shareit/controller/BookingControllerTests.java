@@ -197,4 +197,42 @@ public class BookingControllerTests {
                 .andExpect(jsonPath("$[0].item.description", is(bookingDto.getItem().getDescription())))
                 .andExpect(jsonPath("$[0].item.available", is(bookingDto.getItem().getAvailable())));
     }
+
+    @Test
+    public void createBookingWithNegativeIdBookerTest() throws Exception {
+        BookingDto bookingDto1 = new BookingDto();
+        bookingDto1.setBookerId(-1L);
+        bookingDto1.setItemId(1L);
+
+        Mockito.when(service.createRequest(Mockito.anyLong(), Mockito.any(BookingDto.class)))
+                .thenReturn(bookingDto);
+
+        String json = mapper.writeValueAsString(bookingDto1);
+
+        mvc.perform(post("/bookings")
+                        .header(Constants.HEADER, user.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void createBookingWithNegativeIdItemTest() throws Exception {
+        BookingDto bookingDto1 = new BookingDto();
+        bookingDto1.setBookerId(1L);
+        bookingDto1.setItemId(-1L);
+
+        Mockito.when(service.createRequest(Mockito.anyLong(), Mockito.any(BookingDto.class)))
+                .thenReturn(bookingDto);
+
+        String json = mapper.writeValueAsString(bookingDto1);
+
+        mvc.perform(post("/bookings")
+                        .header(Constants.HEADER, user.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 }
