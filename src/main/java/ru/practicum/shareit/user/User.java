@@ -21,6 +21,7 @@ import static javax.persistence.GenerationType.*;
 @Getter
 @Setter
 @NoArgsConstructor
+@EqualsAndHashCode
 public class User {
     @Positive(message = "id must be positive")
     @Id
