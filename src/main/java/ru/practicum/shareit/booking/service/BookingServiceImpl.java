@@ -145,7 +145,7 @@ public class BookingServiceImpl implements BookingService {
 
     @SneakyThrows
     private Booking bookingNotFound(Long bookingId) {
-        return bookingRepository.findById(bookingId).orElseThrow(() -> new ItemNotFound(
+        return bookingRepository.findById(bookingId).orElseThrow(() -> new EntityNotFound(
                 "booking with id " + bookingId + " was not found"));
     }
 

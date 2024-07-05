@@ -39,12 +39,12 @@ public class ErrorHandler {
         return new ErrorResponse(exception.getMessage());
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleItemNotFound(final ItemNotFound exception) {
-        log.info(exception.getMessage());
-        return new ErrorResponse(exception.getMessage());
-    }
+ //   @ExceptionHandler
+ //   @ResponseStatus(HttpStatus.NOT_FOUND)
+ //   public ErrorResponse handleItemNotFound(final ItemNotFound exception) {
+  //      log.info(exception.getMessage());
+  //      return new ErrorResponse(exception.getMessage());
+  //  }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
