@@ -1,12 +1,11 @@
 package ru.practicum.shareit.user.service;
 
-import ru.practicum.shareit.exceptions.EmailAlreadyExistsException;
 import ru.practicum.shareit.user.User;
 
 import java.util.List;
 
 public interface UserService {
-    public User create(User user) throws EmailAlreadyExistsException;
+    public User create(User user);
 
     public User update(Long userId, User user);
 
