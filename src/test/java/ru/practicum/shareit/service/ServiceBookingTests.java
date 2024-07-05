@@ -84,7 +84,7 @@ public class ServiceBookingTests {
         user1.setEmail("new@mail.ru");
 
         bookingDto.setStart(LocalDateTime.now().plusSeconds(1));
-        bookingDto.setEnd(LocalDateTime.now().plusSeconds(1));
+        bookingDto.setEnd(LocalDateTime.now().plusSeconds(2));
         service.createRequest(user1.getId(), bookingDto);
 
         Mockito.verify(bookingRepository, Mockito.times(1))
@@ -103,7 +103,7 @@ public class ServiceBookingTests {
         user1.setEmail("new@mail.ru");
 
         bookingDto.setStart(LocalDateTime.now().plusSeconds(1));
-        bookingDto.setEnd(LocalDateTime.now().plusSeconds(1));
+        bookingDto.setEnd(LocalDateTime.now().plusSeconds(2));
 
         Assertions.assertThrows(EntityNotFoundException.class, () -> service.createRequest(user.getId(), bookingDto));
     }
@@ -120,7 +120,7 @@ public class ServiceBookingTests {
         user1.setEmail("new@mail.ru");
 
         bookingDto.setStart(LocalDateTime.now().plusSeconds(1));
-        bookingDto.setEnd(LocalDateTime.now().plusSeconds(1));
+        bookingDto.setEnd(LocalDateTime.now().plusSeconds(2));
 
         Assertions.assertThrows(EntityNotFound.class, () -> service.createRequest(user.getId(), bookingDto));
     }
