@@ -6,10 +6,8 @@ import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.State;
@@ -107,10 +105,10 @@ public class BookingServiceImpl implements BookingService {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new EntityNotFound("user with id " + userId + " was not found"));
         if (from < 0) {
-            throw new IllegalArgumentException("from couldn't be less 0 " + from );
+            throw new IllegalArgumentException("from couldn't be less 0 " + from);
         }
         if (size <= 0) {
-            throw new IllegalArgumentException("size couldn't be less 0 " + from );
+            throw new IllegalArgumentException("size couldn't be less 0 " + from);
         }
         if (state == null) {
             state = String.valueOf(State.ALL);
@@ -132,10 +130,10 @@ public class BookingServiceImpl implements BookingService {
                 new EntityNotFound("user with id " + userId + " was not found"));
         List<Booking> bookings = new ArrayList<>();
         if (from < 0) {
-            throw new IllegalArgumentException("from couldn't be less 0 " + from );
+            throw new IllegalArgumentException("from couldn't be less 0 " + from);
         }
         if (size <= 0) {
-            throw new IllegalArgumentException("size couldn't be less 0 " + from );
+            throw new IllegalArgumentException("size couldn't be less 0 " + from);
         }
         if (state == null) {
             state = String.valueOf(State.ALL);
@@ -177,7 +175,7 @@ public class BookingServiceImpl implements BookingService {
     private List<Booking> chooseRequest(User user, State state, Long from, Long size) {
         int fromInt = Integer.parseInt(from.toString());
         int sizeInt = Integer.parseInt(size.toString());
-        Pageable page = PageRequest.of(fromInt/sizeInt, sizeInt);
+        Pageable page = PageRequest.of(fromInt / sizeInt, sizeInt);
         if (state == null) {
             state = State.ALL;
         }
@@ -206,7 +204,7 @@ public class BookingServiceImpl implements BookingService {
     private List<Booking> chooseRequestForOwner(List<Item> items, State state, Long from, Long size) {
         int fromInt = Integer.parseInt(from.toString());
         int sizeInt = Integer.parseInt(size.toString());
-        Pageable page = PageRequest.of(fromInt/sizeInt, sizeInt);
+        Pageable page = PageRequest.of(fromInt / sizeInt, sizeInt);
 
         switch (state) {
             case CURRENT:

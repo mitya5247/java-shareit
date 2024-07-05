@@ -13,7 +13,6 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.persistence.EntityManager;
-import java.util.List;
 
 @SpringBootTest(properties = "db.name = test")
 public class UserRepositoryTests {
