@@ -60,6 +60,7 @@ public class JsonItemTests {
         assertThat(content).extractingJsonPathNumberValue("$.requestId", itemDto.getRequestId());
 
     }
+
     @Test
     public void deSerializeItemTest() throws IOException {
         JsonContent<ItemDto> content = tester.write(itemDto);

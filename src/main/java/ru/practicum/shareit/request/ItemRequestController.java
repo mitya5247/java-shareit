@@ -2,7 +2,6 @@ package ru.practicum.shareit.request;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.Constants;
 import ru.practicum.shareit.request.model.Request;
@@ -38,7 +37,7 @@ public class ItemRequestController {
         return service.getAllRequest(userId, from, size);
     }
 
-    @GetMapping("/{requestId}")
+    @GetMapping(Constants.PATH_REQUEST_ID)
     public Request getOneRequest(@RequestHeader(Constants.HEADER) Long userId, @PathVariable Long requestId) {
         return service.getOneRequest(userId, requestId);
     }

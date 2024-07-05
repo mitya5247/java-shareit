@@ -66,7 +66,7 @@ public class RequestRepositoryTests {
     public void saveRequestTest() {
 
         TypedQuery<Request> query = em.createQuery("select r from Request r where r.id = :id", Request.class)
-                        .setParameter("id", requestId);
+                .setParameter("id", requestId);
         Request request1 = query.getSingleResult();
 
         Assertions.assertEquals(requestId, request1.getId());
@@ -88,6 +88,7 @@ public class RequestRepositoryTests {
         Assertions.assertEquals(request.getRequestor(), requestList.get(0).getRequestor());
 
     }
+
     @Test
     public void getRequestTest() {
 

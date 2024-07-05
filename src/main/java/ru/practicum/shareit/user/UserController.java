@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.Constants;
-import ru.practicum.shareit.exceptions.EmailAlreadyExistsException;
 import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;

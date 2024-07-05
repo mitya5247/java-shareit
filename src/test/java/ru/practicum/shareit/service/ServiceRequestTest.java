@@ -3,14 +3,12 @@ package ru.practicum.shareit.service;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.exceptions.EntityNotFound;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.model.Request;
@@ -34,7 +32,6 @@ public class ServiceRequestTest {
     RequestService service;
     User user;
     Request request;
-    ItemRequestDto requestDto;
 
     @BeforeEach
     public void initRequest() {
@@ -84,7 +81,7 @@ public class ServiceRequestTest {
         requestList.add(request);
 
         Mockito.when(requestRepository.findByRequestorOrderByCreatedDesc(Mockito.anyLong()))
-                        .thenReturn(requestList);
+                .thenReturn(requestList);
 
         service.getRequestOfUser(user.getId());
 
@@ -112,7 +109,6 @@ public class ServiceRequestTest {
         service.getAllRequest(user.getId(), 0L, 10L);
 
 
-
         Mockito.verify(requestRepository, Mockito.times(1))
                 .findAll(page);
 
@@ -130,7 +126,6 @@ public class ServiceRequestTest {
                 .thenReturn(Optional.ofNullable(request));
 
         service.getOneRequest(user.getId(), request.getId());
-
 
 
         Mockito.verify(requestRepository, Mockito.times(1))

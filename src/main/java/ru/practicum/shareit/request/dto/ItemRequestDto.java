@@ -3,8 +3,6 @@ package ru.practicum.shareit.request.dto;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.Entity;
-
 /**
  * TODO Sprint add-item-requests.
  */

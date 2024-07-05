@@ -162,7 +162,7 @@ public class ServiceBookingTests {
         Mockito.when(itemRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(item));
 
-        service.getAllUserBookings(user.getId(), "ALL", 0L ,10L);
+        service.getAllUserBookings(user.getId(), "ALL", 0L, 10L);
 
         Mockito.verify(bookingRepository, Mockito.times(1))
                 .findAllByBookerOrderByStartDesc(user, PageRequest.of(0, 10));
@@ -178,7 +178,7 @@ public class ServiceBookingTests {
         Mockito.when(itemRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(item));
 
-        service.getAllUserBookings(user.getId(), "CURRENT", 0L ,10L);
+        service.getAllUserBookings(user.getId(), "CURRENT", 0L, 10L);
 
         Mockito.verify(bookingRepository, Mockito.times(1))
                 .findAllByBookerAndStartBeforeAndEndAfterOrderByStartAsc(Mockito.any(User.class), Mockito.any(LocalDateTime.class),
@@ -195,7 +195,7 @@ public class ServiceBookingTests {
         Mockito.when(itemRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(item));
 
-        service.getAllUserBookings(user.getId(), "FUTURE", 0L ,10L);
+        service.getAllUserBookings(user.getId(), "FUTURE", 0L, 10L);
 
         Mockito.verify(bookingRepository, Mockito.times(1))
                 .findAllByBookerAndEndAfterOrderByStartDesc(Mockito.any(User.class), Mockito.any(LocalDateTime.class),
@@ -212,7 +212,7 @@ public class ServiceBookingTests {
         Mockito.when(itemRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(item));
 
-        service.getAllUserBookings(user.getId(), "PAST", 0L ,10L);
+        service.getAllUserBookings(user.getId(), "PAST", 0L, 10L);
 
         Mockito.verify(bookingRepository, Mockito.times(1))
                 .findAllByBookerAndEndBeforeOrderByStartDesc(Mockito.any(User.class), Mockito.any(LocalDateTime.class),
@@ -229,7 +229,7 @@ public class ServiceBookingTests {
         Mockito.when(itemRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(item));
 
-        service.getAllUserBookings(user.getId(), "APPROVED", 0L ,10L);
+        service.getAllUserBookings(user.getId(), "APPROVED", 0L, 10L);
 
         Mockito.verify(bookingRepository, Mockito.times(1))
                 .findAllByStatusAndBookerOrderByStartDesc(Mockito.any(), Mockito.any(User.class),
@@ -246,7 +246,7 @@ public class ServiceBookingTests {
         Mockito.when(itemRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(item));
 
-        service.getAllUserBookings(user.getId(), "REJECTED", 0L ,10L);
+        service.getAllUserBookings(user.getId(), "REJECTED", 0L, 10L);
 
         Mockito.verify(bookingRepository, Mockito.times(1))
                 .findAllByStatusAndBookerOrderByStartDesc(Mockito.any(), Mockito.any(User.class),
@@ -263,7 +263,7 @@ public class ServiceBookingTests {
         Mockito.when(itemRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(item));
 
-        service.getAllUserBookings(user.getId(), "WAITING", 0L ,10L);
+        service.getAllUserBookings(user.getId(), "WAITING", 0L, 10L);
 
         Mockito.verify(bookingRepository, Mockito.times(1))
                 .findAllByStatusAndBookerOrderByStartDesc(Mockito.any(), Mockito.any(User.class),
@@ -285,9 +285,9 @@ public class ServiceBookingTests {
         items.add(item);
 
         Mockito.when(itemRepository.findAllByOwnerOrderById(Mockito.anyLong()))
-                        .thenReturn(items);
+                .thenReturn(items);
 
-        service.getAllItemsBooked(user.getId(), "ALL", 0L ,10L);
+        service.getAllItemsBooked(user.getId(), "ALL", 0L, 10L);
 
         Mockito.verify(bookingRepository, Mockito.times(1))
                 .findAllByItemInOrderByStartDesc(items, PageRequest.of(0, 10));
@@ -310,7 +310,7 @@ public class ServiceBookingTests {
         Mockito.when(itemRepository.findAllByOwnerOrderById(Mockito.anyLong()))
                 .thenReturn(items);
 
-        service.getAllItemsBooked(user.getId(), "PAST", 0L ,10L);
+        service.getAllItemsBooked(user.getId(), "PAST", 0L, 10L);
 
         Mockito.verify(bookingRepository, Mockito.times(1))
                 .findAllByItemInAndEndBeforeOrderByStartDesc(Mockito.anyList(), Mockito.any(LocalDateTime.class), Mockito.any(Pageable.class));
@@ -333,7 +333,7 @@ public class ServiceBookingTests {
         Mockito.when(itemRepository.findAllByOwnerOrderById(Mockito.anyLong()))
                 .thenReturn(items);
 
-        service.getAllItemsBooked(user.getId(), "FUTURE", 0L ,10L);
+        service.getAllItemsBooked(user.getId(), "FUTURE", 0L, 10L);
 
         Mockito.verify(bookingRepository, Mockito.times(1))
                 .findAllByItemInAndEndAfterOrderByStartDesc(Mockito.anyList(), Mockito.any(LocalDateTime.class), Mockito.any(Pageable.class));
@@ -356,7 +356,7 @@ public class ServiceBookingTests {
         Mockito.when(itemRepository.findAllByOwnerOrderById(Mockito.anyLong()))
                 .thenReturn(items);
 
-        service.getAllItemsBooked(user.getId(), "APPROVED", 0L ,10L);
+        service.getAllItemsBooked(user.getId(), "APPROVED", 0L, 10L);
 
         Mockito.verify(bookingRepository, Mockito.times(1))
                 .findAllByStatusAndItemInOrderByStartDesc(Mockito.any(), Mockito.anyList(), Mockito.any(Pageable.class));
@@ -379,7 +379,7 @@ public class ServiceBookingTests {
         Mockito.when(itemRepository.findAllByOwnerOrderById(Mockito.anyLong()))
                 .thenReturn(items);
 
-        service.getAllItemsBooked(user.getId(), "REJECTED", 0L ,10L);
+        service.getAllItemsBooked(user.getId(), "REJECTED", 0L, 10L);
 
         Mockito.verify(bookingRepository, Mockito.times(1))
                 .findAllByStatusAndItemInOrderByStartDesc(Mockito.any(), Mockito.anyList(), Mockito.any(Pageable.class));
@@ -402,7 +402,7 @@ public class ServiceBookingTests {
         Mockito.when(itemRepository.findAllByOwnerOrderById(Mockito.anyLong()))
                 .thenReturn(items);
 
-        service.getAllItemsBooked(user.getId(), "WAITING", 0L ,10L);
+        service.getAllItemsBooked(user.getId(), "WAITING", 0L, 10L);
 
         Mockito.verify(bookingRepository, Mockito.times(1))
                 .findAllByStatusAndItemInOrderByStartDesc(Mockito.any(), Mockito.anyList(), Mockito.any(Pageable.class));
@@ -419,7 +419,7 @@ public class ServiceBookingTests {
                 .thenReturn(Optional.ofNullable(item));
 
         Assertions.assertThrows(UnknownState.class, () ->
-                service.getAllUserBookings(user.getId(), "UNKNOWN", 0L ,10L));
+                service.getAllUserBookings(user.getId(), "UNKNOWN", 0L, 10L));
 
     }
 }

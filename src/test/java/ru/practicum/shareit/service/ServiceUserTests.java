@@ -34,7 +34,7 @@ public class ServiceUserTests {
         service.create(user);
 
         Mockito.when(repository.save(user))
-                        .thenReturn(user);
+                .thenReturn(user);
 
         Mockito.verify(repository, Mockito.times(1))
                 .save(user);

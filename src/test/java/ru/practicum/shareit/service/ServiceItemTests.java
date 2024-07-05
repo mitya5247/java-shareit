@@ -128,7 +128,6 @@ public class ServiceItemTests {
     }
 
 
-
     @Test
     public void getAllItemsTest() {
         Mockito.when(itemRepository.findById(Mockito.anyLong()))
@@ -193,7 +192,7 @@ public class ServiceItemTests {
         List<ItemDto> itemDtos = new ArrayList<>();
         itemDtos.add(itemDto);
         Mockito.when(itemRepository.findAllByNameOrDescriptionContainingIgnoreCase(Mockito.anyString(), Mockito.anyString()))
-                        .thenReturn(items);
+                .thenReturn(items);
 
         service.search("описание");
 

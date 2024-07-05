@@ -30,19 +30,14 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ItemServiceImpl implements ItemService {
 
-    @Autowired
     ItemRepository repository;
-    @Autowired
     UserRepository userRepository;
-    @Autowired
     CommentRepository commentRepository;
-    @Autowired
     BookingRepository bookingRepository;
-    @Autowired
     RequestRepository requestRepository;
 
     @SneakyThrows

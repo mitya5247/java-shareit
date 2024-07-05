@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -57,15 +56,15 @@ public class RequestServiceImpl implements RequestService {
     public List<Request> getAllRequest(Long userId, Long from, Long size) {
         User user = this.userNotFound(userId);
         if (from < 0) {
-            throw new IllegalArgumentException("from couldn't be less 0 " + from );
+            throw new IllegalArgumentException("from couldn't be less 0 " + from);
         }
         if (size <= 0) {
-            throw new IllegalArgumentException("size couldn't be less 0 " + from );
+            throw new IllegalArgumentException("size couldn't be less 0 " + from);
         }
         int sizeInt = Integer.parseInt(String.valueOf(size));
         int fromInt = Integer.parseInt(String.valueOf(from));
         Pageable page = PageRequest.of(fromInt, sizeInt, Sort.by("created").descending());
-        List<Request> requests = requestRepository.findAll(page).toList().stream() // null из-за page
+        List<Request> requests = requestRepository.findAll(page).toList().stream()
                 .filter(request -> !request.getRequestor().equals(userId))
                 .map(request -> this.fillItemsRequestDto(request, userId))
                 .collect(Collectors.toList());

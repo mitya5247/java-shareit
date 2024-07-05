@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -65,11 +64,11 @@ public class ItemControllerTests {
         String json = mapper.writeValueAsString(itemDto);
 
         mvc.perform(post("/items")
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .characterEncoding(StandardCharsets.UTF_8)
-                .header(Constants.HEADER, user.getId())
-                .content(json))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .header(Constants.HEADER, user.getId())
+                        .content(json))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(Integer.parseInt(String.valueOf(itemDto.getId())))))
                 .andExpect(jsonPath("$.name", is(itemDto.getName())))
@@ -169,13 +168,12 @@ public class ItemControllerTests {
         comment.setText("comment");
 
 
-
         String json = mapper.writeValueAsString(comment);
 
         Mockito.when(itemService.addComment(Mockito.anyLong(), Mockito.anyLong(), Mockito.any(Comment.class)))
                 .thenReturn(Mapper.convertCommentToDto(comment));
 
-        mvc.perform(post("/items/" + itemDto.getId() +"/comment")
+        mvc.perform(post("/items/" + itemDto.getId() + "/comment")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .characterEncoding(StandardCharsets.UTF_8)

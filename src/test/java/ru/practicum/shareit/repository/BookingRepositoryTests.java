@@ -82,7 +82,7 @@ public class BookingRepositoryTests {
     public void createBooking() {
 
         TypedQuery<Booking> query = em.createQuery("select b from Booking b where b.id = :id", Booking.class)
-                        .setParameter("id", bookingId);
+                .setParameter("id", bookingId);
         Booking booking1 = query.getSingleResult();
 
         Assertions.assertEquals(bookingId, booking1.getId());
@@ -250,7 +250,7 @@ public class BookingRepositoryTests {
         items.add(item);
 
         List<Booking> bookings = bookingRepository.findAllByItemInAndEndBeforeOrderByStartDesc(items, LocalDateTime.now()
-                        .plusMonths(1), PageRequest.of(0, 10));
+                .plusMonths(1), PageRequest.of(0, 10));
 
         Assertions.assertEquals(bookingId, bookings.get(0).getId());
         Assertions.assertEquals(booking.getItem().getId(), bookings.get(0).getItem().getId());

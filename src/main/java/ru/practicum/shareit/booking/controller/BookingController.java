@@ -24,13 +24,13 @@ public class BookingController {
     BookingService service;
 
     @PostMapping
-    public BookingDtoResponse createRequest(@RequestHeader(Constants.HEADER) Long userId,@Valid @RequestBody BookingDto bookingDto) {
+    public BookingDtoResponse createRequest(@RequestHeader(Constants.HEADER) Long userId, @Valid @RequestBody BookingDto bookingDto) {
         return service.createRequest(userId, bookingDto);
     }
 
     @PatchMapping(Constants.PATH_BOOKING_ID)
     public BookingDtoResponse updateState(@RequestHeader(Constants.HEADER) Long userId, @PathVariable Long bookingId,
-                        @RequestParam(name = "approved") String state) {
+                                          @RequestParam(name = "approved") String state) {
         return service.updateState(userId, bookingId, state);
     }
 
@@ -41,14 +41,14 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDtoResponse> getAllUserBookings(@RequestHeader(Constants.HEADER) Long userId,
-                                     @RequestParam(name = "state", required = false) String state, @RequestParam(required = false,
+                                                       @RequestParam(name = "state", required = false) String state, @RequestParam(required = false,
             defaultValue = "0") Long from, @RequestParam(required = false, defaultValue = "10") Long size) {
         return service.getAllUserBookings(userId, state, from, size);
     }
 
     @GetMapping("/owner")
     public List<BookingDtoResponse> getAllItemsBooked(@RequestHeader(Constants.HEADER) Long userId,
-                                    @RequestParam(name = "state", required = false) String state, @RequestParam(required = false,
+                                                      @RequestParam(name = "state", required = false) String state, @RequestParam(required = false,
             defaultValue = "0") Long from, @RequestParam(required = false, defaultValue = "10") Long size) {
         return service.getAllItemsBooked(userId, state, from, size);
     }

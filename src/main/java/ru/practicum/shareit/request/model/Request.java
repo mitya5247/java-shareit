@@ -2,11 +2,9 @@ package ru.practicum.shareit.request.model;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import ru.practicum.shareit.exceptions.NotEmptyDescription;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 
 import javax.persistence.*;
-import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;

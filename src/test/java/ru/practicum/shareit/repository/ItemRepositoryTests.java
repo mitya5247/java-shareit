@@ -61,11 +61,11 @@ public class ItemRepositoryTests {
     @Test
     public void create() {
         TypedQuery<Item> query = em.createQuery("select i from Item i where i.id = :id", Item.class)
-                        .setParameter("id", itemId);
+                .setParameter("id", itemId);
         Item item1 = query.getSingleResult();
-        Assertions.assertEquals(itemId , item1.getId());
-        Assertions.assertEquals(itemDto.getName() , item1.getName());
-        Assertions.assertEquals(itemDto.getDescription() , item1.getDescription());
+        Assertions.assertEquals(itemId, item1.getId());
+        Assertions.assertEquals(itemDto.getName(), item1.getName());
+        Assertions.assertEquals(itemDto.getDescription(), item1.getDescription());
     }
 
     @Test
@@ -75,9 +75,9 @@ public class ItemRepositoryTests {
         TypedQuery<Item> query = em.createQuery("select i from Item i where i.id = :id", Item.class)
                 .setParameter("id", itemId);
         Item item1 = query.getSingleResult();
-        Assertions.assertEquals(itemId , item1.getId());
-        Assertions.assertEquals(item.getName() , item1.getName());
-        Assertions.assertEquals(item.getDescription() , item1.getDescription());
+        Assertions.assertEquals(itemId, item1.getId());
+        Assertions.assertEquals(item.getName(), item1.getName());
+        Assertions.assertEquals(item.getDescription(), item1.getDescription());
     }
 
     @Test
@@ -86,9 +86,9 @@ public class ItemRepositoryTests {
         TypedQuery<Item> query = em.createQuery("select i from Item i where i.id = :id", Item.class)
                 .setParameter("id", itemId);
         Item item1 = query.getSingleResult();
-        Assertions.assertEquals(itemId , item1.getId());
-        Assertions.assertEquals(item.getName() , item1.getName());
-        Assertions.assertEquals(item.getDescription() , item1.getDescription());
+        Assertions.assertEquals(itemId, item1.getId());
+        Assertions.assertEquals(item.getName(), item1.getName());
+        Assertions.assertEquals(item.getDescription(), item1.getDescription());
     }
 
     @Test
@@ -102,9 +102,9 @@ public class ItemRepositoryTests {
         TypedQuery<Comment> query = em.createQuery("select c from Comment c where c.id = :id", Comment.class)
                 .setParameter("id", commentId);
         Comment comment1 = query.getSingleResult();
-        Assertions.assertEquals(commentId , comment1.getId());
-        Assertions.assertEquals(comment.getText() , comment1.getText());
-        Assertions.assertEquals(comment.getUser() , comment1.getUser());
+        Assertions.assertEquals(commentId, comment1.getId());
+        Assertions.assertEquals(comment.getText(), comment1.getText());
+        Assertions.assertEquals(comment.getUser(), comment1.getUser());
     }
 
     @Test
@@ -116,9 +116,9 @@ public class ItemRepositoryTests {
 
         Long commentId = commentRepository.save(comment).getId();
         Comment comment1 = commentRepository.findById(commentId).get();
-        Assertions.assertEquals(commentId , comment1.getId());
-        Assertions.assertEquals(comment.getText() , comment1.getText());
-        Assertions.assertEquals(comment.getUser() , comment1.getUser());
+        Assertions.assertEquals(commentId, comment1.getId());
+        Assertions.assertEquals(comment.getText(), comment1.getText());
+        Assertions.assertEquals(comment.getUser(), comment1.getUser());
     }
 
     @AfterEach

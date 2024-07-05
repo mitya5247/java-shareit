@@ -58,6 +58,7 @@ public class RequestControllerTest {
         mapper.registerModule(new JavaTimeModule());
 
     }
+
     @Test
     public void createRequestTest() throws Exception {
 
@@ -68,10 +69,10 @@ public class RequestControllerTest {
         String json = mapper.writeValueAsString(request);
 
         mvc.perform(post("/requests")
-                .content(json)
-                .header(Constants.HEADER, user.getId())
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(json)
+                        .header(Constants.HEADER, user.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(Integer.parseInt(String.valueOf(request.getId())))))
                 .andExpect(jsonPath("$.description", is(request.getDescription())))

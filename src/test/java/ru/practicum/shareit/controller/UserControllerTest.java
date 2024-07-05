@@ -9,7 +9,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.shareit.Constants;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserController;
 import ru.practicum.shareit.user.service.UserService;
@@ -57,14 +56,14 @@ public class UserControllerTest {
         String json = mapper.writeValueAsString(user);
 
         mvc.perform(post("/users")
-                .content(json)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .characterEncoding(StandardCharsets.UTF_8))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id", is(Integer.parseInt(String.valueOf(user.getId())))))
-            .andExpect(jsonPath("$.email", is(user.getEmail())))
-            .andExpect(jsonPath("$.name", is(user.getName())));
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .characterEncoding(StandardCharsets.UTF_8))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(Integer.parseInt(String.valueOf(user.getId())))))
+                .andExpect(jsonPath("$.email", is(user.getEmail())))
+                .andExpect(jsonPath("$.name", is(user.getName())));
     }
 
     @Test
