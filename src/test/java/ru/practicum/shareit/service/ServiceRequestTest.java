@@ -7,8 +7,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import ru.practicum.shareit.exceptions.EntityNotFound;
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.repository.RequestRepository;
@@ -94,24 +93,30 @@ public class ServiceRequestTest {
     @Test
     public void getAllRequestsTest() {
 
-        Pageable page = PageRequest.of(0, 10);
-
         List<Request> requestList = new ArrayList<>();
         requestList.add(request);
 
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
 
-        Mockito.when(requestRepository.findAll(PageRequest.of(0, 10)).toList())
+
+        Page<Request> page1 = Mockito.mock(Page.class);
+
+        Mockito.when(requestRepository.findAll(Mockito.any(Pageable.class)))
+                .thenReturn(page1);
+
+        Mockito.when(page1.toList())
                 .thenReturn(requestList);
 
         service.getAllRequest(user.getId(), 0L, 10L);
 
 
         Mockito.verify(requestRepository, Mockito.times(1))
-                .findAll(page);
+                .findAll(PageRequest.of(0, 10, Sort.by("created").descending()));
 
-        Assertions.assertEquals(requestList, requestRepository.findAll(page));
+        List<Request> requestList1 = requestRepository.findAll(PageRequest.of(0, 10, Sort.by("created").descending())).toList();
+
+        Assertions.assertEquals(requestList, requestList1);
 
     }
 
