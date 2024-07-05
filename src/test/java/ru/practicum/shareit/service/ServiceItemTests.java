@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.State;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.exceptions.BadComment;
 import ru.practicum.shareit.exceptions.EntityNotFound;
 import ru.practicum.shareit.item.Mapper;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -77,6 +79,21 @@ public class ServiceItemTests {
     }
 
     @Test
+    public void createItemWithUnknownRequestTest() {
+
+        itemDto.setRequestId(5L);
+
+        Mockito.when(userRepository.findById(user.getId()))
+                .thenReturn(Optional.ofNullable(user));
+
+        Mockito.when(itemRepository.save(Mockito.any(Item.class)))
+                .thenReturn(item);
+
+        Assertions.assertThrows(EntityNotFound.class, () -> service.add(user.getId(), itemDto));
+
+    }
+
+    @Test
     public void createItemByUnknownUserTest() {
 
         Assertions.assertThrows(EntityNotFound.class, () -> service.add(user.getId(), itemDto));
@@ -104,6 +121,24 @@ public class ServiceItemTests {
     }
 
     @Test
+    public void updateByNotOwnerItemTest() {
+
+        user.setId(3L);
+
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        Mockito.when(itemRepository.save(Mockito.any(Item.class)))
+                .thenReturn(item);
+
+        Assertions.assertThrows(EntityNotFound.class, () -> service.update(user.getId(), itemDto.getId(), itemDto));
+
+    }
+
+    @Test
     public void getItemTest() {
 
         Mockito.when(itemRepository.findById(Mockito.anyLong()))
@@ -116,6 +151,24 @@ public class ServiceItemTests {
 
         Mockito.verify(itemRepository, Mockito.times(1))
                 .findById(itemDto.getId());
+
+    }
+
+    @Test
+    public void getItemByOtherUserTest() {
+
+        user.setId(3L);
+
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        Mockito.when(itemRepository.save(Mockito.any(Item.class)))
+                .thenReturn(item);
+
+        service.get(user.getId(), itemDto.getId());
+
+        Assertions.assertNull(itemDto.getNextBooking());
+        Assertions.assertNull(itemDto.getLastBooking());
 
     }
 
@@ -143,6 +196,40 @@ public class ServiceItemTests {
 
         Mockito.verify(itemRepository, Mockito.times(1))
                 .findAllByOwnerOrderById(user.getId());
+
+    }
+
+    @Test
+    public void getAllItemsByNullNextBookingTest() {
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        List<Item> items = new ArrayList<>();
+        items.add(item);
+
+        Mockito.when(itemRepository.findAllByOwnerOrderById(user.getId()))
+                .thenReturn(items);
+
+        Booking booking = new Booking();
+        booking.setId(1L);
+        booking.setBooker(user);
+        booking.setItem(item);
+
+        booking.setStart(LocalDateTime.now());
+        booking.setEnd(LocalDateTime.now().plusSeconds(124));
+
+        Mockito.when(bookingRepository.findFirstByItemAndStartBetweenOrderByStartDesc(Mockito.any(Item.class),
+                        Mockito.any(), Mockito.any()))
+                .thenReturn(booking);
+
+        service.getAll(user.getId());
+
+        Mockito.verify(itemRepository, Mockito.times(1))
+                .findAllByOwnerOrderById(user.getId());
+
+        Mockito.verify(bookingRepository, Mockito.times(2))
+                .findFirstByItemAndStartBetweenOrderByStartDesc(Mockito.any(Item.class),
+                Mockito.any(), Mockito.any());
 
     }
 
@@ -181,6 +268,68 @@ public class ServiceItemTests {
                 .save(item);
         Mockito.verify(commentRepository, Mockito.times(1))
                 .save(comment);
+
+    }
+
+    @Test
+    public void addCommentByNotBookerTest() {
+
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        Booking booking = new Booking();
+        booking.setItem(item);
+        booking.setId(1L);
+        booking.setBooker(user);
+        booking.setStart(LocalDateTime.now());
+        booking.setEnd(LocalDateTime.now());
+
+        Comment comment = new Comment();
+        comment.setCreated(LocalDateTime.now());
+        comment.setId(1L);
+        comment.setUser(user);
+        comment.setText("коммент");
+
+        List<Item> items = new ArrayList<>();
+        items.add(item);
+
+        Assertions.assertThrows(BadComment.class, () -> service.addComment(user.getId(), item.getId(), comment));
+
+    }
+
+    @Test
+    public void addCommentByAPPROVEDStateTest() {
+
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+
+        Booking booking = new Booking();
+        booking.setItem(item);
+        booking.setId(1L);
+        booking.setBooker(user);
+        booking.setStart(LocalDateTime.now());
+        booking.setEnd(LocalDateTime.now());
+        booking.setStatus(State.APPROVED);
+
+        Comment comment = new Comment();
+        comment.setId(1L);
+        comment.setText("коммент");
+
+        List<Item> items = new ArrayList<>();
+        items.add(item);
+
+        Mockito.when(bookingRepository.findFirstByBookerAndItemOrderByStart(Mockito.any(User.class), Mockito.any(Item.class)))
+                .thenReturn(booking);
+
+        service.addComment(user.getId(), item.getId(), comment);
+
+        Assertions.assertEquals(user, comment.getUser());
 
     }
 

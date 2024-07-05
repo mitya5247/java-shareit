@@ -6,7 +6,6 @@ import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exceptions.EmailAlreadyExistsException;
 import ru.practicum.shareit.exceptions.EntityNotFound;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -57,15 +56,6 @@ public class UserServiceImpl implements UserService {
     @SneakyThrows
     private User userNotFound(Long id) {
         return repository.findById(id).orElseThrow(() -> new EntityNotFound("user with id " + id + " was not found"));
-    }
-
-    @SneakyThrows
-    private void checkEmailOnDuplicate(String email) {
-        for (User user : this.getAll()) {
-            if (user.getEmail().equals(email)) {
-                throw new EmailAlreadyExistsException("email " + email + " is already exists");
-            }
-        }
     }
 
     private void fillFields(User user, User userNew) {

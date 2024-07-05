@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
 import ru.practicum.shareit.exceptions.EntityNotFound;
+import ru.practicum.shareit.exceptions.NotEmptyDescription;
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.request.service.RequestService;
@@ -64,9 +65,50 @@ public class ServiceRequestTest {
     }
 
     @Test
+    public void createRequestWithoutItemsTest() {
+
+        request.setItems(null);
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+
+        Mockito.when(requestRepository.save(Mockito.any(Request.class)))
+                .thenReturn(request);
+
+        service.create(user.getId(), request);
+
+        Mockito.verify(requestRepository, Mockito.times(1))
+                .save(Mockito.any(Request.class));
+
+        Assertions.assertEquals(request, requestRepository.save(request));
+
+    }
+
+    @Test
     public void createRequestByUnknownUserTest() {
 
         Assertions.assertThrows(EntityNotFound.class, () -> service.create(user.getId(), request));
+
+    }
+
+    @Test
+    public void createRequestithEmptyDescrUserTest() {
+
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+
+        request.setDescription("");
+        Assertions.assertThrows(NotEmptyDescription.class, () -> service.create(user.getId(), request));
+
+    }
+
+    @Test
+    public void createRequestithNullDescrUserTest() {
+
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+
+        request.setDescription(null);
+        Assertions.assertThrows(NotEmptyDescription.class, () -> service.create(user.getId(), request));
 
     }
 
@@ -121,6 +163,34 @@ public class ServiceRequestTest {
     }
 
     @Test
+    public void getAllRequestsWithNegativeFromTest() {
+
+        List<Request> requestList = new ArrayList<>();
+        requestList.add(request);
+
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> service.getAllRequest(user.getId(), -1L, 10L));
+
+    }
+
+    @Test
+    public void getAllRequestsWithNegativeSizeTest() {
+
+        List<Request> requestList = new ArrayList<>();
+        requestList.add(request);
+
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> service.getAllRequest(user.getId(), 1L, -10L));
+
+    }
+
+    @Test
     public void getOneRequestTest() {
 
         Mockito.when(userRepository.findById(Mockito.anyLong()))
@@ -136,6 +206,16 @@ public class ServiceRequestTest {
                 .findById(request.getId());
 
         Assertions.assertEquals(request, service.getOneRequest(user.getId(), request.getId()));
+
+    }
+
+    @Test
+    public void getOneUnknownRequestTest() {
+
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+
+        Assertions.assertThrows(EntityNotFound.class, () -> service.getOneRequest(user.getId(), 100L));
 
     }
 }

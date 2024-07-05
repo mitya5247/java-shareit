@@ -113,11 +113,7 @@ public class BookingServiceImpl implements BookingService {
         if (state == null) {
             state = String.valueOf(State.ALL);
         }
-        try {
-            bookings = this.chooseRequest(user, State.valueOf(state), from, size);
-        } catch (IllegalArgumentException e) {
-            throw new UnknownState("Unknown state: " + state);
-        }
+            bookings = this.chooseRequest(user, state, from, size);
         return bookings.stream()
                 .map(Mapper::convertToBookingDtoResponse)
                 .collect(Collectors.toList());
@@ -133,18 +129,14 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalArgumentException("from couldn't be less 0 " + from);
         }
         if (size <= 0) {
-            throw new IllegalArgumentException("size couldn't be less 0 " + from);
+            throw new IllegalArgumentException("size couldn't be less 0 " + size);
         }
         if (state == null) {
             state = String.valueOf(State.ALL);
         }
         List<Item> items = itemRepository.findAllByOwnerOrderById(userId);
         if (!items.isEmpty()) {
-            try {
-                bookings = this.chooseRequestForOwner(items, State.valueOf(state), from, size);
-            } catch (IllegalArgumentException e) {
-                throw new UnknownState("Unknown state: " + state);
-            }
+                bookings = this.chooseRequestForOwner(items, state, from, size);
         }
         return bookings.stream()
                 .map(Mapper::convertToBookingDtoResponse)
@@ -172,14 +164,20 @@ public class BookingServiceImpl implements BookingService {
 
 
     @SneakyThrows
-    private List<Booking> chooseRequest(User user, State state, Long from, Long size) {
+    private List<Booking> chooseRequest(User user, String state, Long from, Long size) {
+        State state1;
+        try {
+            state1 = State.valueOf(state);
+        } catch (IllegalArgumentException e) {
+            state1 = State.UNSUPPORTED_STATUS;
+        }
         int fromInt = Integer.parseInt(from.toString());
         int sizeInt = Integer.parseInt(size.toString());
         Pageable page = PageRequest.of(fromInt / sizeInt, sizeInt);
         if (state == null) {
-            state = State.ALL;
+            state1 = State.ALL;
         }
-        switch (state) {
+        switch (state1) {
             case CURRENT:
                 return bookingRepository.findAllByBookerAndStartBeforeAndEndAfterOrderByStartAsc(user,
                         LocalDateTime.now(), LocalDateTime.now(), page);
@@ -196,17 +194,23 @@ public class BookingServiceImpl implements BookingService {
             case ALL:
                 return bookingRepository.findAllByBookerOrderByStartDesc(user, page);
             default:
-                throw new UnknownState("UnknownState: " + state);
+                throw new UnknownState("Unknown state: " + state);
         }
     }
 
     @SneakyThrows
-    private List<Booking> chooseRequestForOwner(List<Item> items, State state, Long from, Long size) {
+    private List<Booking> chooseRequestForOwner(List<Item> items, String state, Long from, Long size) {
+        State state1;
+        try {
+            state1 = State.valueOf(state);
+        } catch (IllegalArgumentException e) {
+            state1 = State.UNSUPPORTED_STATUS;
+        }
         int fromInt = Integer.parseInt(from.toString());
         int sizeInt = Integer.parseInt(size.toString());
         Pageable page = PageRequest.of(fromInt / sizeInt, sizeInt);
 
-        switch (state) {
+        switch (state1) {
             case CURRENT:
                 return bookingRepository.findAllByItemInAndStartBeforeAndEndAfterOrderByStartDesc(items,
                         LocalDateTime.now(), LocalDateTime.now(), page);
@@ -223,7 +227,7 @@ public class BookingServiceImpl implements BookingService {
             case ALL:
                 return bookingRepository.findAllByItemInOrderByStartDesc(items, page);
             default:
-                throw new UnknownState("UnknownState: " + state);
+                throw new UnknownState("Unknown state: " + state);
         }
     }
 

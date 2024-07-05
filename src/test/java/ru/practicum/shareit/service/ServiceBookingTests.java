@@ -10,11 +10,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.State;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.exceptions.EntityNotFound;
-import ru.practicum.shareit.exceptions.UnknownState;
+import ru.practicum.shareit.exceptions.*;
 import ru.practicum.shareit.item.Mapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
@@ -92,6 +92,112 @@ public class ServiceBookingTests {
     }
 
     @Test
+    public void createBookingOnAvailableItemTest() {
+
+        item.setAvailable(false);
+
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        bookingDto.setStart(LocalDateTime.now().plusSeconds(1));
+        bookingDto.setEnd(LocalDateTime.now().plusSeconds(2));
+
+        Assertions.assertThrows(ItemIsUnAvailable.class, () -> service.createRequest(user.getId(), bookingDto));
+
+
+    }
+
+    @Test
+    public void createBookingWithNullStartTest() {
+
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        bookingDto.setStart(LocalDateTime.now().plusSeconds(1));
+        bookingDto.setEnd(null);
+
+        Assertions.assertThrows(BookingDtoIsNotValid.class, () -> service.createRequest(user.getId(), bookingDto));
+    }
+
+    @Test
+    public void createBookingWithNullEndTest() {
+
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        bookingDto.setStart(LocalDateTime.now());
+        bookingDto.setEnd(null);
+
+        Assertions.assertThrows(BookingDtoIsNotValid.class, () -> service.createRequest(user.getId(), bookingDto));
+    }
+
+    @Test
+    public void createBookingWithStartEqualsEndTest() {
+
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        bookingDto.setStart(LocalDateTime.now());
+        bookingDto.setEnd(bookingDto.getStart());
+
+        Assertions.assertThrows(BookingDtoIsNotValid.class, () -> service.createRequest(user.getId(), bookingDto));
+    }
+
+    @Test
+    public void createBookingWithPastStartAndEndTest() {
+
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        bookingDto.setStart(LocalDateTime.now().minusHours(23));
+        bookingDto.setEnd(LocalDateTime.now().minusHours(22));
+
+        Assertions.assertThrows(BookingDtoIsNotValid.class, () -> service.createRequest(user.getId(), bookingDto));
+    }
+
+    @Test
+    public void createBookingWithPastStartEarlierThenEndTest() {
+
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        bookingDto.setStart(LocalDateTime.now().minusHours(2));
+        bookingDto.setEnd(LocalDateTime.now().minusHours(22));
+
+        Assertions.assertThrows(BookingDtoIsNotValid.class, () -> service.createRequest(user.getId(), bookingDto));
+    }
+
+    @Test
+    public void createBookingOnOwnerItemTest() {
+
+        item.setOwner(user.getId());
+
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        bookingDto.setStart(LocalDateTime.now().plusSeconds(1));
+        bookingDto.setEnd(LocalDateTime.now().plusSeconds(2));
+
+        Assertions.assertThrows(EntityNotFound.class, () -> service.createRequest(user.getId(), bookingDto));
+
+
+    }
+
+    @Test
     public void createBookingWithUnknownUserTest() {
 
         Mockito.when(itemRepository.findById(Mockito.anyLong()))
@@ -141,6 +247,67 @@ public class ServiceBookingTests {
     }
 
     @Test
+    public void updateBookingStateWithByUnknownItemTest() {
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+
+        Assertions.assertThrows(EntityNotFound.class, () -> service.updateState(user.getId(), bookingDto.getId(), "true"));
+    }
+
+    @Test
+    public void updateBookingStateWithAlreadyACCEPTEDTest() {
+        booking.setStatus(State.APPROVED);
+
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        Assertions.assertThrows(UnknownState.class, () -> service.updateState(user.getId(), bookingDto.getId(), "true"));
+    }
+
+    @Test
+    public void updateBookingStateWithByOtherUserTest() {
+        booking.setStatus(State.APPROVED);
+        user.setId(2L);
+
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        Assertions.assertThrows(EntityNotFound.class, () -> service.updateState(user.getId(), bookingDto.getId(), "true"));
+    }
+
+    @Test
+    public void updateBookingStateREJECTEDTest() {
+
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        service.updateState(user.getId(), bookingDto.getId(), "false");
+
+        Mockito.verify(bookingRepository, Mockito.times(1))
+                .save(Mockito.any(Booking.class));
+
+    }
+
+    @Test
+    public void updateBookingStateUnkwnownTest() {
+
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+
+        Assertions.assertThrows(UnknownState.class, () -> service.updateState(user.getId(), bookingDto.getId(), "bla"));
+
+    }
+
+    @Test
     public void getBookingTest() {
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(booking));
@@ -151,6 +318,30 @@ public class ServiceBookingTests {
 
         Mockito.verify(bookingRepository, Mockito.times(1))
                 .findById(Mockito.anyLong());
+
+    }
+
+    @Test
+    public void getBookingByUnknownItemTest() {
+        user.setId(30L);
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+
+        Assertions.assertThrows(EntityNotFound.class, () -> service.get(user.getId(), bookingDto.getId()));
+
+    }
+
+    @Test
+    public void getBookingByUnknownUserTest() {
+        user.setId(30L);
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+
+        Assertions.assertThrows(EntityNotFound.class, () -> service.get(user.getId(), bookingDto.getId()));
 
     }
 
@@ -273,6 +464,61 @@ public class ServiceBookingTests {
     }
 
     @Test
+    public void getUserBookingsByUnknownUserTest() {
+
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        Assertions.assertThrows(EntityNotFound.class, () -> service.getAllUserBookings(user.getId(), null, 0L, 10L));
+
+    }
+
+    @Test
+    public void getNullStateUserBookingsTest() {
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        service.getAllUserBookings(user.getId(), null, 0L, 10L);
+
+        Mockito.verify(bookingRepository, Mockito.times(1))
+                .findAllByBookerOrderByStartDesc(Mockito.any(User.class),
+                        Mockito.any(Pageable.class));
+
+    }
+
+    @Test
+    public void getStateUserBookingsWithNegativeFromTest() {
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        Assertions.assertThrows(IllegalArgumentException.class, () ->  service.getAllUserBookings(user.getId(), null, -1L, 10L));
+
+    }
+
+    @Test
+    public void getAllUserBookingsWithNegativeSizeTest() {
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        Assertions.assertThrows(IllegalArgumentException.class, () ->  service.getAllUserBookings(user.getId(), null, 0L, -10L));
+
+    }
+
+    @Test
     public void getAllItemsBookedTest() {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
@@ -289,6 +535,99 @@ public class ServiceBookingTests {
                 .thenReturn(items);
 
         service.getAllItemsBooked(user.getId(), "ALL", 0L, 10L);
+
+        Mockito.verify(bookingRepository, Mockito.times(1))
+                .findAllByItemInOrderByStartDesc(items, PageRequest.of(0, 10));
+
+    }
+
+    @Test
+    public void getAllItemsBookedByUnknownUserTest() {
+
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        List<Item> items = new ArrayList<>();
+
+        items.add(item);
+
+        Assertions.assertThrows(EntityNotFound.class, () -> service.getAllItemsBooked(user.getId(), "ALL", 0L, 10L));
+
+    }
+
+    @Test
+    public void getAllItemsBookedByNegativeFromTest() {
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        List<Item> items = new ArrayList<>();
+
+        items.add(item);
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> service.getAllItemsBooked(user.getId(), "ALL", -1L, 10L));
+
+    }
+
+    @Test
+    public void getAllItemsBookedByNegativeSizeTest() {
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        List<Item> items = new ArrayList<>();
+
+        items.add(item);
+
+        Assertions.assertThrows(IllegalArgumentException.class, () -> service.getAllItemsBooked(user.getId(), "ALL", 0L, -10L));
+
+    }
+
+    @Test
+    public void getAllItemsBookedByUnknownStateTest() {
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        List<Item> items = new ArrayList<>();
+
+        items.add(item);
+
+        Mockito.when(itemRepository.findAllByOwnerOrderById(Mockito.anyLong()))
+                .thenReturn(items);
+
+        Assertions.assertThrows(UnknownState.class, () -> service.getAllItemsBooked(user.getId(), "bla", 0L, 10L));
+
+    }
+
+    @Test
+    public void getAllItemsBookedByNullStateTest() {
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        List<Item> items = new ArrayList<>();
+
+        items.add(item);
+
+        Mockito.when(itemRepository.findAllByOwnerOrderById(Mockito.anyLong()))
+                .thenReturn(items);
+
+        service.getAllItemsBooked(user.getId(), null, 0L, 10L);
 
         Mockito.verify(bookingRepository, Mockito.times(1))
                 .findAllByItemInOrderByStartDesc(items, PageRequest.of(0, 10));
@@ -407,6 +746,30 @@ public class ServiceBookingTests {
 
         Mockito.verify(bookingRepository, Mockito.times(1))
                 .findAllByStatusAndItemInOrderByStartDesc(Mockito.any(), Mockito.anyList(), Mockito.any(Pageable.class));
+
+    }
+
+    @Test
+    public void getCURRENTItemsBookedTest() {
+        Mockito.when(userRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(user));
+        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(booking));
+        Mockito.when(itemRepository.findById(Mockito.anyLong()))
+                .thenReturn(Optional.ofNullable(item));
+
+        List<Item> items = new ArrayList<>();
+
+        items.add(item);
+
+        Mockito.when(itemRepository.findAllByOwnerOrderById(Mockito.anyLong()))
+                .thenReturn(items);
+
+        service.getAllItemsBooked(user.getId(), "CURRENT", 0L, 10L);
+
+        Mockito.verify(bookingRepository, Mockito.times(1))
+                .findAllByItemInAndStartBeforeAndEndAfterOrderByStartDesc(Mockito.anyList(),
+                        Mockito.any(), Mockito.any(), Mockito.any(Pageable.class));
 
     }
 
