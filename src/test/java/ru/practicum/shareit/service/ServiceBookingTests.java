@@ -97,6 +97,7 @@ public class ServiceBookingTests {
         Mockito.when(itemRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(item));
 
+
         User user1 = new User();
         user1.setId(2L);
         user1.setName("name");
