@@ -2,7 +2,6 @@ package ru.practicum.shareit.request.service;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 
 import org.springframework.data.domain.PageRequest;
@@ -30,9 +29,8 @@ public class RequestServiceImpl implements RequestService {
     RequestRepository requestRepository;
 
 
-    @SneakyThrows
     @Override
-    public Request create(Long userId, Request request) {
+    public Request create(Long userId, Request request) throws NotEmptyDescription, EntityNotFound {
         User user = this.userNotFound(userId);
         this.isEmptyDescription(request);
         request.setRequestor(userId);
@@ -43,7 +41,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<Request> getRequestOfUser(Long userId) {
+    public List<Request> getRequestOfUser(Long userId) throws EntityNotFound {
         User user = this.userNotFound(userId);
         List<Request> requests = requestRepository.findByRequestorOrderByCreatedDesc(userId);
         for (Request request : requests) {
@@ -53,7 +51,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<Request> getAllRequest(Long userId, Long from, Long size) {
+    public List<Request> getAllRequest(Long userId, Long from, Long size) throws EntityNotFound {
         User user = this.userNotFound(userId);
         if (from < 0) {
             throw new IllegalArgumentException("from couldn't be less 0 " + from);
@@ -72,21 +70,19 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public Request getOneRequest(Long userId, Long requestId) {
+    public Request getOneRequest(Long userId, Long requestId) throws EntityNotFound {
         User user = this.userNotFound(userId);
         Request request = this.requestNotFound(requestId);
         this.fillItemsRequestDto(request, userId);
         return request;
     }
 
-    @SneakyThrows
-    private User userNotFound(Long userId) {
+    private User userNotFound(Long userId) throws EntityNotFound {
         return userRepository.findById(userId).orElseThrow(() ->
                 new EntityNotFound("user with id " + userId + " was not found"));
     }
 
-    @SneakyThrows
-    private Request requestNotFound(Long requestId) {
+    private Request requestNotFound(Long requestId) throws EntityNotFound {
         return requestRepository.findById(requestId).orElseThrow(() ->
                 new EntityNotFound("request with id " + requestId + " was not found"));
     }
@@ -96,8 +92,7 @@ public class RequestServiceImpl implements RequestService {
         return request;
     }
 
-    @SneakyThrows
-    private void isEmptyDescription(Request request) {
+    private void isEmptyDescription(Request request) throws NotEmptyDescription {
         if (request.getDescription() == null || request.getDescription().isEmpty()) {
             throw new NotEmptyDescription("descriptiom mustn't be null");
         }

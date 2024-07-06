@@ -48,7 +48,7 @@ public class ServiceRequestTest {
     }
 
     @Test
-    public void createRequestTest() {
+    public void createRequestTest() throws EntityNotFound, NotEmptyDescription {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
 
@@ -65,7 +65,7 @@ public class ServiceRequestTest {
     }
 
     @Test
-    public void createRequestWithoutItemsTest() {
+    public void createRequestWithoutItemsTest() throws EntityNotFound, NotEmptyDescription {
 
         request.setItems(null);
         Mockito.when(userRepository.findById(Mockito.anyLong()))
@@ -113,7 +113,7 @@ public class ServiceRequestTest {
     }
 
     @Test
-    public void getRequestOfUserTest() {
+    public void getRequestOfUserTest() throws EntityNotFound {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
 
@@ -133,7 +133,7 @@ public class ServiceRequestTest {
     }
 
     @Test
-    public void getAllRequestsTest() {
+    public void getAllRequestsTest() throws EntityNotFound {
 
         List<Request> requestList = new ArrayList<>();
         requestList.add(request);
@@ -191,7 +191,7 @@ public class ServiceRequestTest {
     }
 
     @Test
-    public void getOneRequestTest() {
+    public void getOneRequestTest() throws EntityNotFound {
 
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));

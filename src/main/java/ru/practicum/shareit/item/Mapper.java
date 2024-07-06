@@ -47,9 +47,7 @@ public class Mapper {
             item.setLastBooking(Mapper.convertToBooking(itemDto.getLastBooking()));
             item.setNextBooking(Mapper.convertToBooking(itemDto.getNextBooking()));
         }
-        //   if (itemDto.getRequestId() != null) {
-        //       item.setRequestId(itemDto.getRequestId());
-        //  }
+
         return item;
     }
 

@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.service;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,9 +39,8 @@ public class ItemServiceImpl implements ItemService {
     BookingRepository bookingRepository;
     RequestRepository requestRepository;
 
-    @SneakyThrows
     @Override
-    public ItemDto add(Long userId, ItemDto itemDto) {
+    public ItemDto add(Long userId, ItemDto itemDto) throws EntityNotFound {
         this.checkExistUser(userId);
         List<Comment> comments = new ArrayList<>();
         List<CommentDto> commentDtos = new ArrayList<>();
@@ -59,7 +57,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto update(Long userId, Long itemId, ItemDto itemDto) {
+    public ItemDto update(Long userId, Long itemId, ItemDto itemDto) throws EntityNotFound {
         this.checkExistUser(userId);
         Item item = this.itemNotFound(itemId);
         this.fillFields(userId, item, itemDto);
@@ -68,7 +66,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto get(Long userId, Long id) {
+    public ItemDto get(Long userId, Long id) throws EntityNotFound {
         Item item = this.itemNotFound(id);
         this.synchronizeBooking(item);
         ItemDto itemDto = Mapper.convertToDto(item);
@@ -102,9 +100,8 @@ public class ItemServiceImpl implements ItemService {
         return itemDto;
     }
 
-    @SneakyThrows
     @Override
-    public CommentDto addComment(Long userId, Long itemId, Comment comment) {
+    public CommentDto addComment(Long userId, Long itemId, Comment comment) throws EntityNotFound, BadComment {
         Item item = itemNotFound(itemId);
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFound("user with id " + userId + " was not found"));
@@ -125,19 +122,16 @@ public class ItemServiceImpl implements ItemService {
         return Mapper.convertCommentToDto(comment);
     }
 
-    @SneakyThrows
-    private void checkExistUser(Long id) {
+    private void checkExistUser(Long id) throws EntityNotFound {
         userRepository.findById(id).orElseThrow(() -> new EntityNotFound("user with id " + id + " was not found"));
     }
 
-    @SneakyThrows
-    private Item itemNotFound(Long itemId) {
+    private Item itemNotFound(Long itemId) throws EntityNotFound {
         return repository.findById(itemId).orElseThrow(() ->
                 new EntityNotFound("item with id " + itemId + " was not found"));
     }
 
-    @SneakyThrows
-    private void fillFields(Long userId, Item item, ItemDto itemDto) {
+    private void fillFields(Long userId, Item item, ItemDto itemDto) throws EntityNotFound {
         if (Objects.equals(item.getOwner(), userId)) {
             if (itemDto.getName() != null) {
                 item.setName(itemDto.getName());

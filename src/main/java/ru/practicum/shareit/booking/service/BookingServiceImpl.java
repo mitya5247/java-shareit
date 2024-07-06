@@ -2,10 +2,8 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,15 +29,13 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class BookingServiceImpl implements BookingService {
 
-    private static final Logger log = LoggerFactory.getLogger(BookingServiceImpl.class);
     BookingRepository bookingRepository;
     ItemRepository itemRepository;
     UserRepository userRepository;
 
-    @SneakyThrows
     @Override
-    public BookingDtoResponse createRequest(Long userId, BookingDto bookingDto) {
-        this.validateTimeBookingDto(bookingDto);
+    public BookingDtoResponse createRequest(Long userId, BookingDto bookingDto) throws EntityNotFound, ItemIsUnAvailable, BookingDtoIsNotValid {
+            this.validateTimeBookingDto(bookingDto);
         Booking booking = Mapper.convertToBooking(bookingDto);
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new EntityNotFoundException("user with id " + userId + " was not found"));
@@ -57,9 +53,8 @@ public class BookingServiceImpl implements BookingService {
         return Mapper.convertToBookingDtoResponse(booking);
     }
 
-    @SneakyThrows
     @Override
-    public BookingDtoResponse updateState(Long userId, Long bookingId, String state) {
+    public BookingDtoResponse updateState(Long userId, Long bookingId, String state) throws EntityNotFound, UnknownState {
         Booking booking = this.bookingNotFound(bookingId);
         Item item = itemRepository.findById(booking.getItem().getId()).orElseThrow(() ->
                 new EntityNotFound("item with id " + booking.getItem().getId() + " was not found"));
@@ -85,9 +80,8 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    @SneakyThrows
     @Override
-    public BookingDtoResponse get(Long userId, Long bookingId) {
+    public BookingDtoResponse get(Long userId, Long bookingId) throws EntityNotFound {
         Booking booking = this.bookingNotFound(bookingId);
         Item item = itemRepository.findById(booking.getItem().getId()).orElseThrow(() ->
                 new EntityNotFound("item with id " + booking.getItem().getId() + " was not found"));
@@ -98,9 +92,8 @@ public class BookingServiceImpl implements BookingService {
         return Mapper.convertToBookingDtoResponse(booking);
     }
 
-    @SneakyThrows
     @Override
-    public List<BookingDtoResponse> getAllUserBookings(Long userId, String state, Long from, Long size) {
+    public List<BookingDtoResponse> getAllUserBookings(Long userId, String state, Long from, Long size) throws UnknownState, EntityNotFound {
         List<Booking> bookings;
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new EntityNotFound("user with id " + userId + " was not found"));
@@ -119,9 +112,8 @@ public class BookingServiceImpl implements BookingService {
                 .collect(Collectors.toList());
     }
 
-    @SneakyThrows
     @Override
-    public List<BookingDtoResponse> getAllItemsBooked(Long userId, String state, Long from, Long size) {
+    public List<BookingDtoResponse> getAllItemsBooked(Long userId, String state, Long from, Long size) throws EntityNotFound, UnknownState {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new EntityNotFound("user with id " + userId + " was not found"));
         List<Booking> bookings = new ArrayList<>();
@@ -143,8 +135,7 @@ public class BookingServiceImpl implements BookingService {
                 .collect(Collectors.toList());
     }
 
-    @SneakyThrows
-    private Booking bookingNotFound(Long bookingId) {
+    private Booking bookingNotFound(Long bookingId) throws EntityNotFound {
         return bookingRepository.findById(bookingId).orElseThrow(() -> new EntityNotFound(
                 "booking with id " + bookingId + " was not found"));
     }
@@ -163,8 +154,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
 
-    @SneakyThrows
-    private List<Booking> chooseRequest(User user, String state, Long from, Long size) {
+    private List<Booking> chooseRequest(User user, String state, Long from, Long size) throws UnknownState {
         State state1;
         try {
             state1 = State.valueOf(state);
@@ -198,8 +188,7 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    @SneakyThrows
-    private List<Booking> chooseRequestForOwner(List<Item> items, String state, Long from, Long size) {
+    private List<Booking> chooseRequestForOwner(List<Item> items, String state, Long from, Long size) throws UnknownState {
         State state1;
         try {
             state1 = State.valueOf(state);

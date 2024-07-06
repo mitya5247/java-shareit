@@ -63,7 +63,7 @@ public class ServiceItemTests {
     }
 
     @Test
-    public void createItemTest() {
+    public void createItemTest() throws EntityNotFound {
 
         Mockito.when(userRepository.findById(user.getId()))
                 .thenReturn(Optional.ofNullable(user));
@@ -102,7 +102,7 @@ public class ServiceItemTests {
 
 
     @Test
-    public void updateItemTest() {
+    public void updateItemTest() throws EntityNotFound {
 
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
@@ -139,7 +139,7 @@ public class ServiceItemTests {
     }
 
     @Test
-    public void getItemTest() {
+    public void getItemTest() throws EntityNotFound {
 
         Mockito.when(itemRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(item));
@@ -155,7 +155,7 @@ public class ServiceItemTests {
     }
 
     @Test
-    public void getItemByOtherUserTest() {
+    public void getItemByOtherUserTest() throws EntityNotFound {
 
         user.setId(3L);
 
@@ -234,7 +234,7 @@ public class ServiceItemTests {
     }
 
     @Test
-    public void addCommentTest() {
+    public void addCommentTest() throws EntityNotFound, BadComment {
 
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
@@ -301,7 +301,7 @@ public class ServiceItemTests {
     }
 
     @Test
-    public void addCommentByAPPROVEDStateTest() {
+    public void addCommentByAPPROVEDStateTest() throws EntityNotFound, BadComment {
 
         Mockito.when(itemRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(item));

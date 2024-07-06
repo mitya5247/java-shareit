@@ -2,7 +2,6 @@ package ru.practicum.shareit.user.service;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User update(Long userId, User user) {
+    public User update(Long userId, User user) throws EntityNotFound {
         User user1 = this.userNotFound(userId);
         this.fillFields(user1, user);
         repository.save(user1);
@@ -36,14 +35,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Long id) throws EntityNotFound {
         User user = this.userNotFound(id);
         log.info("delete user with id " + id);
         repository.delete(user);
     }
 
     @Override
-    public User get(Long id) {
+    public User get(Long id) throws EntityNotFound {
         return this.userNotFound(id);
     }
 
@@ -53,8 +52,7 @@ public class UserServiceImpl implements UserService {
         return repository.findAll();
     }
 
-    @SneakyThrows
-    private User userNotFound(Long id) {
+    private User userNotFound(Long id) throws EntityNotFound {
         return repository.findById(id).orElseThrow(() -> new EntityNotFound("user with id " + id + " was not found"));
     }
 

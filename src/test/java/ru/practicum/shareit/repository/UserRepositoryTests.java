@@ -36,20 +36,20 @@ public class UserRepositoryTests {
     }
 
     @Test
-    public void create() {
+    public void create() throws EntityNotFound {
         Assertions.assertEquals(user.getName(), service.get(id).getName());
         Assertions.assertEquals(user.getEmail(), service.get(id).getEmail());
     }
 
     @Test
-    public void get() {
+    public void get() throws EntityNotFound {
 
         Assertions.assertEquals(user.getName(), service.get(id).getName());
         Assertions.assertEquals(user.getEmail(), service.get(id).getEmail());
     }
 
     @Test
-    public void update() {
+    public void update() throws EntityNotFound {
         user.setName("update");
         service.update(user.getId(), user);
         Assertions.assertEquals(user.getName(), service.get(id).getName());
@@ -57,7 +57,7 @@ public class UserRepositoryTests {
     }
 
     @Test
-    public void delete() {
+    public void delete() throws EntityNotFound {
         service.delete(id);
         Assertions.assertThrows(EntityNotFound.class, () -> service.get(id));
     }
