@@ -22,7 +22,7 @@ public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    @NotBlank(message = "text must not be empty")
+    @NotBlank(message = "text must not be an empty")
     @NotNull(message = "text must not be null")
     @Column(name = "text")
     String text;
