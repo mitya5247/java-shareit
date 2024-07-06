@@ -13,28 +13,28 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNotFound(final EntityNotFound exception) {
+    public ErrorResponse handleNotFound(final EntityNotFoundException exception) {
         log.info(exception.getMessage());
         return new ErrorResponse(exception.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleNotAvailable(final ItemIsUnAvailable exception) {
+    public ErrorResponse handleNotAvailable(final ItemIsUnAvailableException exception) {
         log.info(exception.getMessage());
         return new ErrorResponse(exception.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleDtoNotValid(final BookingDtoIsNotValid exception) {
+    public ErrorResponse handleDtoNotValid(final BookingDtoIsNotValidException exception) {
         log.info(exception.getMessage());
         return new ErrorResponse(exception.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public UnknownState handleItemNotFound(final UnknownState exception) {
+    public UnknownStateException handleItemNotFound(final UnknownStateException exception) {
         log.info(exception.getMessage());
         return exception;
     }
@@ -49,14 +49,14 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleBadComment(final BadComment exception) {
+    public ErrorResponse handleBadComment(final BadCommentException exception) {
         log.info(exception.getMessage());
         return new ErrorResponse(exception.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleBadComment(final NotEmptyDescription exception) {
+    public ErrorResponse handleBadComment(final NotEmptyDescriptionException exception) {
         log.info(exception.getMessage());
         return new ErrorResponse(exception.getMessage());
     }

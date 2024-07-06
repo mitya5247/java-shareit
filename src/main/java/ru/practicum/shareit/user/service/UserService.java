@@ -1,6 +1,6 @@
 package ru.practicum.shareit.user.service;
 
-import ru.practicum.shareit.exceptions.EntityNotFound;
+import ru.practicum.shareit.exceptions.EntityNotFoundException;
 import ru.practicum.shareit.user.User;
 
 import java.util.List;
@@ -8,11 +8,11 @@ import java.util.List;
 public interface UserService {
     public User create(User user);
 
-    public User update(Long userId, User user) throws EntityNotFound;
+    public User update(Long userId, User user) throws EntityNotFoundException;
 
-    public void delete(Long id) throws EntityNotFound;
+    public void delete(Long id) throws EntityNotFoundException;
 
-    public User get(Long id) throws EntityNotFound;
+    public User get(Long id) throws EntityNotFoundException;
 
     public List<User> getAll();
 }

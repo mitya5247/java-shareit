@@ -7,7 +7,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import ru.practicum.shareit.exceptions.EntityNotFound;
+import ru.practicum.shareit.exceptions.EntityNotFoundException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
@@ -44,7 +44,7 @@ public class ServiceUserTests {
     }
 
     @Test
-    public void testUpdateUser() throws EntityNotFound {
+    public void testUpdateUser() throws EntityNotFoundException {
 
         user.setName("updateName");
 
@@ -59,7 +59,7 @@ public class ServiceUserTests {
     }
 
     @Test
-    public void testDeleteUser() throws EntityNotFound {
+    public void testDeleteUser() throws EntityNotFoundException {
         Mockito.when(repository.findById(user.getId()))
                 .thenReturn(Optional.ofNullable(user));
         service.delete(user.getId());
@@ -69,7 +69,7 @@ public class ServiceUserTests {
     }
 
     @Test
-    public void testGetUser() throws EntityNotFound {
+    public void testGetUser() throws EntityNotFoundException {
         Mockito.when(repository.findById(user.getId()))
                 .thenReturn(Optional.ofNullable(user));
         service.get(user.getId());

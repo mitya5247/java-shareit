@@ -8,8 +8,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exceptions.EntityNotFound;
-import ru.practicum.shareit.exceptions.NotEmptyDescription;
+import ru.practicum.shareit.exceptions.EntityNotFoundException;
+import ru.practicum.shareit.exceptions.NotEmptyDescriptionException;
 
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.repository.RequestRepository;
@@ -30,7 +30,7 @@ public class RequestServiceImpl implements RequestService {
 
 
     @Override
-    public Request create(Long userId, Request request) throws NotEmptyDescription, EntityNotFound {
+    public Request create(Long userId, Request request) throws NotEmptyDescriptionException, EntityNotFoundException {
         User user = this.userNotFound(userId);
         this.isEmptyDescription(request);
         request.setRequestor(userId);
@@ -41,7 +41,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<Request> getRequestOfUser(Long userId) throws EntityNotFound {
+    public List<Request> getRequestOfUser(Long userId) throws EntityNotFoundException {
         User user = this.userNotFound(userId);
         List<Request> requests = requestRepository.findByRequestorOrderByCreatedDesc(userId);
         for (Request request : requests) {
@@ -51,7 +51,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public List<Request> getAllRequest(Long userId, Long from, Long size) throws EntityNotFound {
+    public List<Request> getAllRequest(Long userId, Long from, Long size) throws EntityNotFoundException {
         User user = this.userNotFound(userId);
         if (from < 0) {
             throw new IllegalArgumentException("from couldn't be less 0 " + from);
@@ -70,21 +70,21 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public Request getOneRequest(Long userId, Long requestId) throws EntityNotFound {
+    public Request getOneRequest(Long userId, Long requestId) throws EntityNotFoundException {
         User user = this.userNotFound(userId);
         Request request = this.requestNotFound(requestId);
         this.fillItemsRequestDto(request, userId);
         return request;
     }
 
-    private User userNotFound(Long userId) throws EntityNotFound {
+    private User userNotFound(Long userId) throws EntityNotFoundException {
         return userRepository.findById(userId).orElseThrow(() ->
-                new EntityNotFound("user with id " + userId + " was not found"));
+                new EntityNotFoundException("user with id " + userId + " was not found"));
     }
 
-    private Request requestNotFound(Long requestId) throws EntityNotFound {
+    private Request requestNotFound(Long requestId) throws EntityNotFoundException {
         return requestRepository.findById(requestId).orElseThrow(() ->
-                new EntityNotFound("request with id " + requestId + " was not found"));
+                new EntityNotFoundException("request with id " + requestId + " was not found"));
     }
 
     private Request fillItemsRequestDto(Request request, Long userId) {
@@ -92,9 +92,9 @@ public class RequestServiceImpl implements RequestService {
         return request;
     }
 
-    private void isEmptyDescription(Request request) throws NotEmptyDescription {
+    private void isEmptyDescription(Request request) throws NotEmptyDescriptionException {
         if (request.getDescription() == null || request.getDescription().isEmpty()) {
-            throw new NotEmptyDescription("descriptiom mustn't be null");
+            throw new NotEmptyDescriptionException("descriptiom mustn't be null");
         }
     }
 }

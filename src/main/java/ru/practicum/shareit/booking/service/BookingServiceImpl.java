@@ -19,7 +19,6 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,18 +33,18 @@ public class BookingServiceImpl implements BookingService {
     UserRepository userRepository;
 
     @Override
-    public BookingDtoResponse createRequest(Long userId, BookingDto bookingDto) throws EntityNotFound, ItemIsUnAvailable, BookingDtoIsNotValid {
+    public BookingDtoResponse createRequest(Long userId, BookingDto bookingDto) throws EntityNotFoundException, ItemIsUnAvailableException, BookingDtoIsNotValidException {
             this.validateTimeBookingDto(bookingDto);
         Booking booking = Mapper.convertToBooking(bookingDto);
         User user = userRepository.findById(userId).orElseThrow(() ->
-                new EntityNotFoundException("user with id " + userId + " was not found"));
+                new javax.persistence.EntityNotFoundException("user with id " + userId + " was not found"));
         Item item = itemRepository.findById(bookingDto.getItemId()).orElseThrow(() ->
-                new EntityNotFound("item with id " + bookingDto.getItemId() + " не найден"));
+                new EntityNotFoundException("item with id " + bookingDto.getItemId() + " не найден"));
         if (!item.isAvailable()) {
-            throw new ItemIsUnAvailable("item with id " + item.getId() + " is not available for booking");
+            throw new ItemIsUnAvailableException("item with id " + item.getId() + " is not available for booking");
         }
         if (item.getOwner().equals(userId)) {
-            throw new EntityNotFound("user couldn't book own item");
+            throw new EntityNotFoundException("user couldn't book own item");
         }
         booking.setItem(item);
         booking.setBooker(user);
@@ -54,16 +53,16 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDtoResponse updateState(Long userId, Long bookingId, String state) throws EntityNotFound, UnknownState {
+    public BookingDtoResponse updateState(Long userId, Long bookingId, String state) throws EntityNotFoundException, UnknownStateException {
         Booking booking = this.bookingNotFound(bookingId);
         Item item = itemRepository.findById(booking.getItem().getId()).orElseThrow(() ->
-                new EntityNotFound("item with id " + booking.getItem().getId() + " was not found"));
+                new EntityNotFoundException("item with id " + booking.getItem().getId() + " was not found"));
         if (!Objects.equals(item.getOwner(), userId)) {
-            throw new EntityNotFound("user with id " + userId + " couldn't change owner's status of item with id " +
+            throw new EntityNotFoundException("user with id " + userId + " couldn't change owner's status of item with id " +
                     item.getOwner());
         }
         if (booking.getStatus().equals(State.APPROVED)) {
-            throw new UnknownState("booking is already accepted");
+            throw new UnknownStateException("booking is already accepted");
         }
         switch (state) {
             case "true":
@@ -76,27 +75,27 @@ public class BookingServiceImpl implements BookingService {
                 bookingRepository.save(booking);
                 return Mapper.convertToBookingDtoResponse(booking);
             default:
-                throw new UnknownState("invalid state");
+                throw new UnknownStateException("invalid state");
         }
     }
 
     @Override
-    public BookingDtoResponse get(Long userId, Long bookingId) throws EntityNotFound {
+    public BookingDtoResponse get(Long userId, Long bookingId) throws EntityNotFoundException {
         Booking booking = this.bookingNotFound(bookingId);
         Item item = itemRepository.findById(booking.getItem().getId()).orElseThrow(() ->
-                new EntityNotFound("item with id " + booking.getItem().getId() + " was not found"));
+                new EntityNotFoundException("item with id " + booking.getItem().getId() + " was not found"));
         if (!Objects.equals(booking.getBooker().getId(), userId) && !Objects.equals(item.getOwner(), userId)) {
-            throw new EntityNotFound("user with id " + userId + " не может просматривать статус запроса с id " +
+            throw new EntityNotFoundException("user with id " + userId + " не может просматривать статус запроса с id " +
                     booking.getId());
         }
         return Mapper.convertToBookingDtoResponse(booking);
     }
 
     @Override
-    public List<BookingDtoResponse> getAllUserBookings(Long userId, String state, Long from, Long size) throws UnknownState, EntityNotFound {
+    public List<BookingDtoResponse> getAllUserBookings(Long userId, String state, Long from, Long size) throws UnknownStateException, EntityNotFoundException {
         List<Booking> bookings;
         User user = userRepository.findById(userId).orElseThrow(() ->
-                new EntityNotFound("user with id " + userId + " was not found"));
+                new EntityNotFoundException("user with id " + userId + " was not found"));
         if (from < 0) {
             throw new IllegalArgumentException("from couldn't be less 0 " + from);
         }
@@ -113,9 +112,9 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoResponse> getAllItemsBooked(Long userId, String state, Long from, Long size) throws EntityNotFound, UnknownState {
+    public List<BookingDtoResponse> getAllItemsBooked(Long userId, String state, Long from, Long size) throws EntityNotFoundException, UnknownStateException {
         User user = userRepository.findById(userId).orElseThrow(() ->
-                new EntityNotFound("user with id " + userId + " was not found"));
+                new EntityNotFoundException("user with id " + userId + " was not found"));
         List<Booking> bookings = new ArrayList<>();
         if (from < 0) {
             throw new IllegalArgumentException("from couldn't be less 0 " + from);
@@ -135,26 +134,26 @@ public class BookingServiceImpl implements BookingService {
                 .collect(Collectors.toList());
     }
 
-    private Booking bookingNotFound(Long bookingId) throws EntityNotFound {
-        return bookingRepository.findById(bookingId).orElseThrow(() -> new EntityNotFound(
+    private Booking bookingNotFound(Long bookingId) throws EntityNotFoundException {
+        return bookingRepository.findById(bookingId).orElseThrow(() -> new EntityNotFoundException(
                 "booking with id " + bookingId + " was not found"));
     }
 
-    private void validateTimeBookingDto(BookingDto bookingDto) throws BookingDtoIsNotValid {
+    private void validateTimeBookingDto(BookingDto bookingDto) throws BookingDtoIsNotValidException {
         if (bookingDto.getStart() == null || bookingDto.getEnd() == null) {
-            throw new BookingDtoIsNotValid("start and end time couldn't be null");
+            throw new BookingDtoIsNotValidException("start and end time couldn't be null");
         } else if (bookingDto.getStart().equals(bookingDto.getEnd())) {
-            throw new BookingDtoIsNotValid("start couldn't be equals end");
+            throw new BookingDtoIsNotValidException("start couldn't be equals end");
         } else if (bookingDto.getEnd().isBefore(LocalDateTime.now()) ||
                 bookingDto.getStart().isBefore(LocalDateTime.now())) {
-            throw new BookingDtoIsNotValid("end and start time couldn't be in past");
+            throw new BookingDtoIsNotValidException("end and start time couldn't be in past");
         } else if (bookingDto.getEnd().isBefore(bookingDto.getStart())) {
-            throw new BookingDtoIsNotValid("end couldn't be earlier than start");
+            throw new BookingDtoIsNotValidException("end couldn't be earlier than start");
         }
     }
 
 
-    private List<Booking> chooseRequest(User user, String state, Long from, Long size) throws UnknownState {
+    private List<Booking> chooseRequest(User user, String state, Long from, Long size) throws UnknownStateException {
         State state1;
         try {
             state1 = State.valueOf(state);
@@ -184,11 +183,11 @@ public class BookingServiceImpl implements BookingService {
             case ALL:
                 return bookingRepository.findAllByBookerOrderByStartDesc(user, page);
             default:
-                throw new UnknownState("Unknown state: " + state);
+                throw new UnknownStateException("Unknown state: " + state);
         }
     }
 
-    private List<Booking> chooseRequestForOwner(List<Item> items, String state, Long from, Long size) throws UnknownState {
+    private List<Booking> chooseRequestForOwner(List<Item> items, String state, Long from, Long size) throws UnknownStateException {
         State state1;
         try {
             state1 = State.valueOf(state);
@@ -216,7 +215,7 @@ public class BookingServiceImpl implements BookingService {
             case ALL:
                 return bookingRepository.findAllByItemInOrderByStartDesc(items, page);
             default:
-                throw new UnknownState("Unknown state: " + state);
+                throw new UnknownStateException("Unknown state: " + state);
         }
     }
 

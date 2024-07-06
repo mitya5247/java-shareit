@@ -10,8 +10,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.State;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.exceptions.BadComment;
-import ru.practicum.shareit.exceptions.EntityNotFound;
+import ru.practicum.shareit.exceptions.BadCommentException;
+import ru.practicum.shareit.exceptions.EntityNotFoundException;
 import ru.practicum.shareit.item.Mapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Comment;
@@ -63,7 +63,7 @@ public class ServiceItemTests {
     }
 
     @Test
-    public void createItemTest() throws EntityNotFound {
+    public void createItemTest() throws EntityNotFoundException {
 
         Mockito.when(userRepository.findById(user.getId()))
                 .thenReturn(Optional.ofNullable(user));
@@ -89,20 +89,20 @@ public class ServiceItemTests {
         Mockito.when(itemRepository.save(Mockito.any(Item.class)))
                 .thenReturn(item);
 
-        Assertions.assertThrows(EntityNotFound.class, () -> service.add(user.getId(), itemDto));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> service.add(user.getId(), itemDto));
 
     }
 
     @Test
     public void createItemByUnknownUserTest() {
 
-        Assertions.assertThrows(EntityNotFound.class, () -> service.add(user.getId(), itemDto));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> service.add(user.getId(), itemDto));
 
     }
 
 
     @Test
-    public void updateItemTest() throws EntityNotFound {
+    public void updateItemTest() throws EntityNotFoundException {
 
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
@@ -134,12 +134,12 @@ public class ServiceItemTests {
         Mockito.when(itemRepository.save(Mockito.any(Item.class)))
                 .thenReturn(item);
 
-        Assertions.assertThrows(EntityNotFound.class, () -> service.update(user.getId(), itemDto.getId(), itemDto));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> service.update(user.getId(), itemDto.getId(), itemDto));
 
     }
 
     @Test
-    public void getItemTest() throws EntityNotFound {
+    public void getItemTest() throws EntityNotFoundException {
 
         Mockito.when(itemRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(item));
@@ -155,7 +155,7 @@ public class ServiceItemTests {
     }
 
     @Test
-    public void getItemByOtherUserTest() throws EntityNotFound {
+    public void getItemByOtherUserTest() throws EntityNotFoundException {
 
         user.setId(3L);
 
@@ -175,7 +175,7 @@ public class ServiceItemTests {
     @Test
     public void getUnknownItemTest() {
 
-        Assertions.assertThrows(EntityNotFound.class, () -> service.get(user.getId(), 100L));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> service.get(user.getId(), 100L));
         Mockito.verify(itemRepository, Mockito.times(1))
                 .findById(Mockito.anyLong());
     }
@@ -234,7 +234,7 @@ public class ServiceItemTests {
     }
 
     @Test
-    public void addCommentTest() throws EntityNotFound, BadComment {
+    public void addCommentTest() throws EntityNotFoundException, BadCommentException {
 
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
@@ -296,12 +296,12 @@ public class ServiceItemTests {
         List<Item> items = new ArrayList<>();
         items.add(item);
 
-        Assertions.assertThrows(BadComment.class, () -> service.addComment(user.getId(), item.getId(), comment));
+        Assertions.assertThrows(BadCommentException.class, () -> service.addComment(user.getId(), item.getId(), comment));
 
     }
 
     @Test
-    public void addCommentByAPPROVEDStateTest() throws EntityNotFound, BadComment {
+    public void addCommentByAPPROVEDStateTest() throws EntityNotFoundException, BadCommentException {
 
         Mockito.when(itemRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(item));

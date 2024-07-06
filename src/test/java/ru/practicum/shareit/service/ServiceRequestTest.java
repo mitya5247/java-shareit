@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
-import ru.practicum.shareit.exceptions.EntityNotFound;
-import ru.practicum.shareit.exceptions.NotEmptyDescription;
+import ru.practicum.shareit.exceptions.EntityNotFoundException;
+import ru.practicum.shareit.exceptions.NotEmptyDescriptionException;
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.request.service.RequestService;
@@ -48,7 +48,7 @@ public class ServiceRequestTest {
     }
 
     @Test
-    public void createRequestTest() throws EntityNotFound, NotEmptyDescription {
+    public void createRequestTest() throws EntityNotFoundException, NotEmptyDescriptionException {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
 
@@ -65,7 +65,7 @@ public class ServiceRequestTest {
     }
 
     @Test
-    public void createRequestWithoutItemsTest() throws EntityNotFound, NotEmptyDescription {
+    public void createRequestWithoutItemsTest() throws EntityNotFoundException, NotEmptyDescriptionException {
 
         request.setItems(null);
         Mockito.when(userRepository.findById(Mockito.anyLong()))
@@ -86,7 +86,7 @@ public class ServiceRequestTest {
     @Test
     public void createRequestByUnknownUserTest() {
 
-        Assertions.assertThrows(EntityNotFound.class, () -> service.create(user.getId(), request));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> service.create(user.getId(), request));
 
     }
 
@@ -97,7 +97,7 @@ public class ServiceRequestTest {
                 .thenReturn(Optional.ofNullable(user));
 
         request.setDescription("");
-        Assertions.assertThrows(NotEmptyDescription.class, () -> service.create(user.getId(), request));
+        Assertions.assertThrows(NotEmptyDescriptionException.class, () -> service.create(user.getId(), request));
 
     }
 
@@ -108,12 +108,12 @@ public class ServiceRequestTest {
                 .thenReturn(Optional.ofNullable(user));
 
         request.setDescription(null);
-        Assertions.assertThrows(NotEmptyDescription.class, () -> service.create(user.getId(), request));
+        Assertions.assertThrows(NotEmptyDescriptionException.class, () -> service.create(user.getId(), request));
 
     }
 
     @Test
-    public void getRequestOfUserTest() throws EntityNotFound {
+    public void getRequestOfUserTest() throws EntityNotFoundException {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
 
@@ -133,7 +133,7 @@ public class ServiceRequestTest {
     }
 
     @Test
-    public void getAllRequestsTest() throws EntityNotFound {
+    public void getAllRequestsTest() throws EntityNotFoundException {
 
         List<Request> requestList = new ArrayList<>();
         requestList.add(request);
@@ -191,7 +191,7 @@ public class ServiceRequestTest {
     }
 
     @Test
-    public void getOneRequestTest() throws EntityNotFound {
+    public void getOneRequestTest() throws EntityNotFoundException {
 
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
@@ -215,7 +215,7 @@ public class ServiceRequestTest {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
 
-        Assertions.assertThrows(EntityNotFound.class, () -> service.getOneRequest(user.getId(), 100L));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> service.getOneRequest(user.getId(), 100L));
 
     }
 }

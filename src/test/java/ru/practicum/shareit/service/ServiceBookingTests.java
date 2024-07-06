@@ -22,7 +22,6 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-import javax.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +71,7 @@ public class ServiceBookingTests {
     }
 
     @Test
-    public void createBookingTest() throws EntityNotFound, ItemIsUnAvailable, BookingDtoIsNotValid {
+    public void createBookingTest() throws EntityNotFoundException, ItemIsUnAvailableException, BookingDtoIsNotValidException {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
         Mockito.when(itemRepository.findById(Mockito.anyLong()))
@@ -104,7 +103,7 @@ public class ServiceBookingTests {
         bookingDto.setStart(LocalDateTime.now().plusSeconds(1));
         bookingDto.setEnd(LocalDateTime.now().plusSeconds(2));
 
-        Assertions.assertThrows(ItemIsUnAvailable.class, () -> service.createRequest(user.getId(), bookingDto));
+        Assertions.assertThrows(ItemIsUnAvailableException.class, () -> service.createRequest(user.getId(), bookingDto));
 
 
     }
@@ -120,7 +119,7 @@ public class ServiceBookingTests {
         bookingDto.setStart(LocalDateTime.now().plusSeconds(1));
         bookingDto.setEnd(null);
 
-        Assertions.assertThrows(BookingDtoIsNotValid.class, () -> service.createRequest(user.getId(), bookingDto));
+        Assertions.assertThrows(BookingDtoIsNotValidException.class, () -> service.createRequest(user.getId(), bookingDto));
     }
 
     @Test
@@ -134,7 +133,7 @@ public class ServiceBookingTests {
         bookingDto.setStart(LocalDateTime.now());
         bookingDto.setEnd(null);
 
-        Assertions.assertThrows(BookingDtoIsNotValid.class, () -> service.createRequest(user.getId(), bookingDto));
+        Assertions.assertThrows(BookingDtoIsNotValidException.class, () -> service.createRequest(user.getId(), bookingDto));
     }
 
     @Test
@@ -148,7 +147,7 @@ public class ServiceBookingTests {
         bookingDto.setStart(LocalDateTime.now());
         bookingDto.setEnd(bookingDto.getStart());
 
-        Assertions.assertThrows(BookingDtoIsNotValid.class, () -> service.createRequest(user.getId(), bookingDto));
+        Assertions.assertThrows(BookingDtoIsNotValidException.class, () -> service.createRequest(user.getId(), bookingDto));
     }
 
     @Test
@@ -162,7 +161,7 @@ public class ServiceBookingTests {
         bookingDto.setStart(LocalDateTime.now().minusHours(23));
         bookingDto.setEnd(LocalDateTime.now().minusHours(22));
 
-        Assertions.assertThrows(BookingDtoIsNotValid.class, () -> service.createRequest(user.getId(), bookingDto));
+        Assertions.assertThrows(BookingDtoIsNotValidException.class, () -> service.createRequest(user.getId(), bookingDto));
     }
 
     @Test
@@ -176,7 +175,7 @@ public class ServiceBookingTests {
         bookingDto.setStart(LocalDateTime.now().plusHours(2));
         bookingDto.setEnd(LocalDateTime.now().plusHours(1));
 
-        Assertions.assertThrows(BookingDtoIsNotValid.class, () -> service.createRequest(user.getId(), bookingDto));
+        Assertions.assertThrows(BookingDtoIsNotValidException.class, () -> service.createRequest(user.getId(), bookingDto));
     }
 
     @Test
@@ -192,7 +191,7 @@ public class ServiceBookingTests {
         bookingDto.setStart(LocalDateTime.now().plusSeconds(1));
         bookingDto.setEnd(LocalDateTime.now().plusSeconds(2));
 
-        Assertions.assertThrows(EntityNotFound.class, () -> service.createRequest(user.getId(), bookingDto));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> service.createRequest(user.getId(), bookingDto));
 
 
     }
@@ -212,7 +211,7 @@ public class ServiceBookingTests {
         bookingDto.setStart(LocalDateTime.now().plusSeconds(1));
         bookingDto.setEnd(LocalDateTime.now().plusSeconds(2));
 
-        Assertions.assertThrows(EntityNotFoundException.class, () -> service.createRequest(user.getId(), bookingDto));
+        Assertions.assertThrows(javax.persistence.EntityNotFoundException.class, () -> service.createRequest(user.getId(), bookingDto));
     }
 
     @Test
@@ -229,11 +228,11 @@ public class ServiceBookingTests {
         bookingDto.setStart(LocalDateTime.now().plusSeconds(1));
         bookingDto.setEnd(LocalDateTime.now().plusSeconds(2));
 
-        Assertions.assertThrows(EntityNotFound.class, () -> service.createRequest(user.getId(), bookingDto));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> service.createRequest(user.getId(), bookingDto));
     }
 
     @Test
-    public void updateBookingStateTest() throws EntityNotFound, UnknownState {
+    public void updateBookingStateTest() throws EntityNotFoundException, UnknownStateException {
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(booking));
         Mockito.when(itemRepository.findById(Mockito.anyLong()))
@@ -251,7 +250,7 @@ public class ServiceBookingTests {
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(booking));
 
-        Assertions.assertThrows(EntityNotFound.class, () -> service.updateState(user.getId(), bookingDto.getId(), "true"));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> service.updateState(user.getId(), bookingDto.getId(), "true"));
     }
 
     @Test
@@ -263,7 +262,7 @@ public class ServiceBookingTests {
         Mockito.when(itemRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(item));
 
-        Assertions.assertThrows(UnknownState.class, () -> service.updateState(user.getId(), bookingDto.getId(), "true"));
+        Assertions.assertThrows(UnknownStateException.class, () -> service.updateState(user.getId(), bookingDto.getId(), "true"));
     }
 
     @Test
@@ -276,11 +275,11 @@ public class ServiceBookingTests {
         Mockito.when(itemRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(item));
 
-        Assertions.assertThrows(EntityNotFound.class, () -> service.updateState(user.getId(), bookingDto.getId(), "true"));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> service.updateState(user.getId(), bookingDto.getId(), "true"));
     }
 
     @Test
-    public void updateBookingStateREJECTEDTest() throws EntityNotFound, UnknownState {
+    public void updateBookingStateREJECTEDTest() throws EntityNotFoundException, UnknownStateException {
 
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(booking));
@@ -303,12 +302,12 @@ public class ServiceBookingTests {
                 .thenReturn(Optional.ofNullable(item));
 
 
-        Assertions.assertThrows(UnknownState.class, () -> service.updateState(user.getId(), bookingDto.getId(), "bla"));
+        Assertions.assertThrows(UnknownStateException.class, () -> service.updateState(user.getId(), bookingDto.getId(), "bla"));
 
     }
 
     @Test
-    public void getBookingTest() throws EntityNotFound {
+    public void getBookingTest() throws EntityNotFoundException {
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(booking));
         Mockito.when(itemRepository.findById(Mockito.anyLong()))
@@ -329,7 +328,7 @@ public class ServiceBookingTests {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
 
-        Assertions.assertThrows(EntityNotFound.class, () -> service.get(user.getId(), bookingDto.getId()));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> service.get(user.getId(), bookingDto.getId()));
 
     }
 
@@ -341,12 +340,12 @@ public class ServiceBookingTests {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
 
-        Assertions.assertThrows(EntityNotFound.class, () -> service.get(user.getId(), bookingDto.getId()));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> service.get(user.getId(), bookingDto.getId()));
 
     }
 
     @Test
-    public void getAllUserBookingsTest() throws EntityNotFound, UnknownState {
+    public void getAllUserBookingsTest() throws EntityNotFoundException, UnknownStateException {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
@@ -362,7 +361,7 @@ public class ServiceBookingTests {
     }
 
     @Test
-    public void getCURRENTUserBookingsTest() throws EntityNotFound, UnknownState {
+    public void getCURRENTUserBookingsTest() throws EntityNotFoundException, UnknownStateException {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
@@ -379,7 +378,7 @@ public class ServiceBookingTests {
     }
 
     @Test
-    public void getFUTUREUserBookingsTest() throws EntityNotFound, UnknownState {
+    public void getFUTUREUserBookingsTest() throws EntityNotFoundException, UnknownStateException {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
@@ -396,7 +395,7 @@ public class ServiceBookingTests {
     }
 
     @Test
-    public void getPASTUserBookingsTest() throws EntityNotFound, UnknownState {
+    public void getPASTUserBookingsTest() throws EntityNotFoundException, UnknownStateException {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
@@ -413,7 +412,7 @@ public class ServiceBookingTests {
     }
 
     @Test
-    public void getAPPROVEDUserBookingsTest() throws EntityNotFound, UnknownState {
+    public void getAPPROVEDUserBookingsTest() throws EntityNotFoundException, UnknownStateException {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
@@ -430,7 +429,7 @@ public class ServiceBookingTests {
     }
 
     @Test
-    public void getREJECTEDUserBookingsTest() throws EntityNotFound, UnknownState {
+    public void getREJECTEDUserBookingsTest() throws EntityNotFoundException, UnknownStateException {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
@@ -447,7 +446,7 @@ public class ServiceBookingTests {
     }
 
     @Test
-    public void getWAITINGUserBookingsTest() throws EntityNotFound, UnknownState {
+    public void getWAITINGUserBookingsTest() throws EntityNotFoundException, UnknownStateException {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
@@ -471,12 +470,12 @@ public class ServiceBookingTests {
         Mockito.when(itemRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(item));
 
-        Assertions.assertThrows(EntityNotFound.class, () -> service.getAllUserBookings(user.getId(), null, 0L, 10L));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> service.getAllUserBookings(user.getId(), null, 0L, 10L));
 
     }
 
     @Test
-    public void getNullStateUserBookingsTest() throws EntityNotFound, UnknownState {
+    public void getNullStateUserBookingsTest() throws EntityNotFoundException, UnknownStateException {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
@@ -519,7 +518,7 @@ public class ServiceBookingTests {
     }
 
     @Test
-    public void getAllItemsBookedTest() throws EntityNotFound, UnknownState {
+    public void getAllItemsBookedTest() throws EntityNotFoundException, UnknownStateException {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
@@ -553,7 +552,7 @@ public class ServiceBookingTests {
 
         items.add(item);
 
-        Assertions.assertThrows(EntityNotFound.class, () -> service.getAllItemsBooked(user.getId(), "ALL", 0L, 10L));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> service.getAllItemsBooked(user.getId(), "ALL", 0L, 10L));
 
     }
 
@@ -607,12 +606,12 @@ public class ServiceBookingTests {
         Mockito.when(itemRepository.findAllByOwnerOrderById(Mockito.anyLong()))
                 .thenReturn(items);
 
-        Assertions.assertThrows(UnknownState.class, () -> service.getAllItemsBooked(user.getId(), "bla", 0L, 10L));
+        Assertions.assertThrows(UnknownStateException.class, () -> service.getAllItemsBooked(user.getId(), "bla", 0L, 10L));
 
     }
 
     @Test
-    public void getAllItemsBookedByNullStateTest() throws EntityNotFound, UnknownState {
+    public void getAllItemsBookedByNullStateTest() throws EntityNotFoundException, UnknownStateException {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
@@ -635,7 +634,7 @@ public class ServiceBookingTests {
     }
 
     @Test
-    public void getPASTItemsBookedTest() throws EntityNotFound, UnknownState {
+    public void getPASTItemsBookedTest() throws EntityNotFoundException, UnknownStateException {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
@@ -658,7 +657,7 @@ public class ServiceBookingTests {
     }
 
     @Test
-    public void getFUTUREItemsBookedTest() throws EntityNotFound, UnknownState {
+    public void getFUTUREItemsBookedTest() throws EntityNotFoundException, UnknownStateException {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
@@ -681,7 +680,7 @@ public class ServiceBookingTests {
     }
 
     @Test
-    public void getAPPROVEDItemsBookedTest() throws EntityNotFound, UnknownState {
+    public void getAPPROVEDItemsBookedTest() throws EntityNotFoundException, UnknownStateException {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
@@ -704,7 +703,7 @@ public class ServiceBookingTests {
     }
 
     @Test
-    public void getREJECTEDItemsBookedTest() throws EntityNotFound, UnknownState {
+    public void getREJECTEDItemsBookedTest() throws EntityNotFoundException, UnknownStateException {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
@@ -727,7 +726,7 @@ public class ServiceBookingTests {
     }
 
     @Test
-    public void getWAITINGItemsBookedTest() throws EntityNotFound, UnknownState {
+    public void getWAITINGItemsBookedTest() throws EntityNotFoundException, UnknownStateException {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
@@ -750,7 +749,7 @@ public class ServiceBookingTests {
     }
 
     @Test
-    public void getCURRENTItemsBookedTest() throws EntityNotFound, UnknownState {
+    public void getCURRENTItemsBookedTest() throws EntityNotFoundException, UnknownStateException {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
         Mockito.when(bookingRepository.findById(Mockito.anyLong()))
@@ -782,7 +781,7 @@ public class ServiceBookingTests {
         Mockito.when(itemRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(item));
 
-        Assertions.assertThrows(UnknownState.class, () ->
+        Assertions.assertThrows(UnknownStateException.class, () ->
                 service.getAllUserBookings(user.getId(), "UNKNOWN", 0L, 10L));
 
     }

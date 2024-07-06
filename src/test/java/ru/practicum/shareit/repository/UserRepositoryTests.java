@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.exceptions.EntityNotFound;
+import ru.practicum.shareit.exceptions.EntityNotFoundException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
@@ -36,20 +36,20 @@ public class UserRepositoryTests {
     }
 
     @Test
-    public void create() throws EntityNotFound {
+    public void create() throws EntityNotFoundException {
         Assertions.assertEquals(user.getName(), service.get(id).getName());
         Assertions.assertEquals(user.getEmail(), service.get(id).getEmail());
     }
 
     @Test
-    public void get() throws EntityNotFound {
+    public void get() throws EntityNotFoundException {
 
         Assertions.assertEquals(user.getName(), service.get(id).getName());
         Assertions.assertEquals(user.getEmail(), service.get(id).getEmail());
     }
 
     @Test
-    public void update() throws EntityNotFound {
+    public void update() throws EntityNotFoundException {
         user.setName("update");
         service.update(user.getId(), user);
         Assertions.assertEquals(user.getName(), service.get(id).getName());
@@ -57,9 +57,9 @@ public class UserRepositoryTests {
     }
 
     @Test
-    public void delete() throws EntityNotFound {
+    public void delete() throws EntityNotFoundException {
         service.delete(id);
-        Assertions.assertThrows(EntityNotFound.class, () -> service.get(id));
+        Assertions.assertThrows(EntityNotFoundException.class, () -> service.get(id));
     }
 
     @AfterEach
