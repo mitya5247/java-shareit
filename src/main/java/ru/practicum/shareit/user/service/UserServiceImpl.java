@@ -2,12 +2,10 @@ package ru.practicum.shareit.user.service;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exceptions.EmailAlreadyExistsException;
-import ru.practicum.shareit.exceptions.EntityNotFound;
+import ru.practicum.shareit.exceptions.EntityNotFoundException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -23,12 +21,12 @@ public class UserServiceImpl implements UserService {
     UserRepository repository;
 
     @Override
-    public User create(User user) throws EmailAlreadyExistsException {
+    public User create(User user) {
         return repository.save(user);
     }
 
     @Override
-    public User update(Long userId, User user) {
+    public User update(Long userId, User user) throws EntityNotFoundException {
         User user1 = this.userNotFound(userId);
         this.fillFields(user1, user);
         repository.save(user1);
@@ -37,14 +35,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(Long id) throws EntityNotFoundException {
         User user = this.userNotFound(id);
         log.info("delete user with id " + id);
         repository.delete(user);
     }
 
     @Override
-    public User get(Long id) {
+    public User get(Long id) throws EntityNotFoundException {
         return this.userNotFound(id);
     }
 
@@ -54,18 +52,8 @@ public class UserServiceImpl implements UserService {
         return repository.findAll();
     }
 
-    @SneakyThrows
-    private User userNotFound(Long id) {
-        return repository.findById(id).orElseThrow(() -> new EntityNotFound("user with id " + id + " was not found"));
-    }
-
-    @SneakyThrows
-    private void checkEmailOnDuplicate(String email) {
-        for (User user : this.getAll()) {
-            if (user.getEmail().equals(email)) {
-                throw new EmailAlreadyExistsException("email " + email + " is already exists");
-            }
-        }
+    private User userNotFound(Long id) throws EntityNotFoundException {
+        return repository.findById(id).orElseThrow(() -> new EntityNotFoundException("user with id " + id + " was not found"));
     }
 
     private void fillFields(User user, User userNew) {

@@ -9,4 +9,7 @@ public class Constants {
 
     public static final String PATH_USER_ID = "/{userId}";
 
+    public static final String PATH_REQUEST_ID = "/{requestId}";
+
+
 }
