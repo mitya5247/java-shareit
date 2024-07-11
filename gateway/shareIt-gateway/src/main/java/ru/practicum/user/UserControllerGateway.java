@@ -2,6 +2,7 @@ package ru.practicum.user;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.Constants;
@@ -10,6 +11,8 @@ import ru.practicum.user.dto.User;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
+@RestController
+@RequestMapping(path = Constants.PATH_USERS)
 public class UserControllerGateway {
     private final UserClient client;
 
@@ -20,7 +23,7 @@ public class UserControllerGateway {
 
     @PostMapping
     public ResponseEntity<Object> create(@Valid @RequestBody User user) {
-        return client.post(Constants.PATH_USERS, user);
+        return client.post("http://localhost:8081/users", user);
     }
 
     @PatchMapping(Constants.PATH_USER_ID)

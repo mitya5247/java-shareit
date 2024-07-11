@@ -7,15 +7,11 @@ import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
-import static javax.persistence.GenerationType.*;
-
 /**
  * TODO Sprint add-controllers.
  */
 @Valid
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Entity
-@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
