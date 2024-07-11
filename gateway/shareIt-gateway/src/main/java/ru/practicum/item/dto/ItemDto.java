@@ -16,6 +16,7 @@ import java.util.List;
 @Setter
 @EqualsAndHashCode
 public class ItemDto {
+    Long id;
     @NotBlank(message = "name must not be empty")
     @NotNull(message = "name must not be null")
     String name;

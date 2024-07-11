@@ -13,8 +13,8 @@ public class ItemClient extends BaseClient {
 
     @Autowired
     public ItemClient(RestTemplateBuilder builder) {
-        super(builder.uriTemplateHandler(new DefaultUriBuilderFactory()).
-                requestFactory(HttpComponentsClientHttpRequestFactory::new).build());
+        super(builder.uriTemplateHandler(new DefaultUriBuilderFactory())
+                        .requestFactory(HttpComponentsClientHttpRequestFactory::new).build());
     }
 
     @Override

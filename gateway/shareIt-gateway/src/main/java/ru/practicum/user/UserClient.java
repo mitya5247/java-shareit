@@ -14,8 +14,8 @@ public class UserClient extends BaseClient {
 
     @Autowired
     public UserClient(RestTemplateBuilder builder) {
-        super(builder.uriTemplateHandler(new DefaultUriBuilderFactory()).
-                requestFactory(HttpComponentsClientHttpRequestFactory::new).build());
+        super(builder.uriTemplateHandler(new DefaultUriBuilderFactory())
+                        .requestFactory(HttpComponentsClientHttpRequestFactory::new).build());
     }
 
     @Override
