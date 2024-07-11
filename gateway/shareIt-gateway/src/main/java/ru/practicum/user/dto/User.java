@@ -3,7 +3,6 @@ package ru.practicum.user.dto;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -17,7 +16,7 @@ import javax.validation.constraints.*;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class User {
-   // Long id;
+    Long id;
     @Email
     @NotBlank(message = "email must not be empty")
     @NotNull(message = "email must not be null")

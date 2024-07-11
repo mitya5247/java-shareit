@@ -8,7 +8,6 @@ import ru.practicum.shareit.Constants;
 import ru.practicum.shareit.exceptions.EntityNotFoundException;
 import ru.practicum.shareit.user.service.UserService;
 
-import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -23,7 +22,7 @@ public class UserController {
     final UserService service;
 
     @PostMapping
-    public User create(@Valid @RequestBody User user) {
+    public User create(@RequestBody User user) {
         return service.create(user);
     }
 

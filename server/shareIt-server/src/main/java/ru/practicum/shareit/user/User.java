@@ -4,7 +4,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import javax.persistence.*;
-import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 import static javax.persistence.GenerationType.*;
@@ -12,7 +11,6 @@ import static javax.persistence.GenerationType.*;
 /**
  * TODO Sprint add-controllers.
  */
-@Valid
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 @Table(name = "users")
@@ -26,12 +24,7 @@ public class User {
     @GeneratedValue(strategy = IDENTITY)
     Long id;
     @Column(name = "email", unique = true)
-    @Email
-    @NotBlank(message = "email must not be empty")
-    @NotNull(message = "email must not be null")
     String email;
     @Column(name = "name")
-    @NotEmpty(message = "name must not be null or empty")
     String name;
-
 }

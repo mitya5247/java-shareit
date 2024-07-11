@@ -27,7 +27,7 @@ public class ItemController {
     ItemService service;
 
     @PostMapping
-    public ItemDto add(@RequestHeader(Constants.HEADER) Long userId, @Valid @RequestBody ItemDto itemDto) throws EntityNotFoundException {
+    public ItemDto add(@RequestHeader(Constants.HEADER) Long userId, @RequestBody ItemDto itemDto) throws EntityNotFoundException {
         return service.add(userId, itemDto);
     }
 
