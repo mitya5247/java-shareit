@@ -8,12 +8,10 @@ import ru.practicum.shareit.Constants;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoResponse;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.exceptions.BookingDtoIsNotValidException;
 import ru.practicum.shareit.exceptions.EntityNotFoundException;
 import ru.practicum.shareit.exceptions.ItemIsUnAvailableException;
 import ru.practicum.shareit.exceptions.UnknownStateException;
 
-import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -28,7 +26,7 @@ public class BookingController {
     BookingService service;
 
     @PostMapping
-    public BookingDtoResponse createRequest(@RequestHeader(Constants.HEADER) Long userId, @Valid @RequestBody BookingDto bookingDto) throws EntityNotFoundException, ItemIsUnAvailableException, BookingDtoIsNotValidException {
+    public BookingDtoResponse createRequest(@RequestHeader(Constants.HEADER) Long userId, @RequestBody BookingDto bookingDto) throws EntityNotFoundException, ItemIsUnAvailableException {
         return service.createRequest(userId, bookingDto);
     }
 
@@ -46,16 +44,15 @@ public class BookingController {
     @GetMapping
     public List<BookingDtoResponse> getAllUserBookings(@RequestHeader(Constants.HEADER) Long userId,
                                                        @RequestParam(name = "state", required = false) String state, @RequestParam(required = false,
-            defaultValue = "0") Long from, @RequestParam(required = false, defaultValue = "10") Long size) throws EntityNotFoundException, UnknownStateException {
+            defaultValue = "0") Long from, @RequestParam(required = false, defaultValue = "10") Long size) throws EntityNotFoundException {
         return service.getAllUserBookings(userId, state, from, size);
     }
 
     @GetMapping("/owner")
     public List<BookingDtoResponse> getAllItemsBooked(@RequestHeader(Constants.HEADER) Long userId,
                                                       @RequestParam(name = "state", required = false) String state, @RequestParam(required = false,
-            defaultValue = "0") Long from, @RequestParam(required = false, defaultValue = "10") Long size) throws EntityNotFoundException, UnknownStateException {
+            defaultValue = "0") Long from, @RequestParam(required = false, defaultValue = "10") Long size) throws EntityNotFoundException {
         return service.getAllItemsBooked(userId, state, from, size);
     }
-
 
 }

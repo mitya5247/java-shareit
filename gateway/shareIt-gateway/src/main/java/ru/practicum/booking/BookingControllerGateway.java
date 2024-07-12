@@ -31,7 +31,8 @@ public class BookingControllerGateway {
     }
 
     @PostMapping
-    public ResponseEntity<Object> createRequest(@RequestHeader(Constants.HEADER) Long userId, @Valid @RequestBody BookingDto bookingDto) throws BookingDtoIsNotValidException {
+    public ResponseEntity<Object> createRequest(@RequestHeader(Constants.HEADER) Long userId, @Valid @RequestBody BookingDto bookingDto)
+            throws BookingDtoIsNotValidException {
         this.validateTimeBookingDto(bookingDto);
         return client.post(baseUri, userId, bookingDto);
     }

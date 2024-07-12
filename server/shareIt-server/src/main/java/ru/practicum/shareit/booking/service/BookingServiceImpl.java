@@ -91,7 +91,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoResponse> getAllUserBookings(Long userId, String state, Long from, Long size) throws UnknownStateException, EntityNotFoundException {
+    public List<BookingDtoResponse> getAllUserBookings(Long userId, String state, Long from, Long size) throws EntityNotFoundException {
         List<Booking> bookings;
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new EntityNotFoundException("user with id " + userId + " was not found"));
@@ -111,7 +111,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoResponse> getAllItemsBooked(Long userId, String state, Long from, Long size) throws EntityNotFoundException, UnknownStateException {
+    public List<BookingDtoResponse> getAllItemsBooked(Long userId, String state, Long from, Long size) throws EntityNotFoundException {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new EntityNotFoundException("user with id " + userId + " was not found"));
         List<Booking> bookings = new ArrayList<>();
@@ -139,19 +139,12 @@ public class BookingServiceImpl implements BookingService {
     }
 
 
-    private List<Booking> chooseRequest(User user, String state, Long from, Long size) throws UnknownStateException {
+    private List<Booking> chooseRequest(User user, String state, Long from, Long size) {
         State state1;
-        try {
-            state1 = State.valueOf(state);
-        } catch (IllegalArgumentException e) {
-            state1 = State.UNSUPPORTED_STATUS;
-        }
         int fromInt = Integer.parseInt(from.toString());
         int sizeInt = Integer.parseInt(size.toString());
         Pageable page = PageRequest.of(fromInt / sizeInt, sizeInt);
-        if (state == null) {
-            state1 = State.ALL;
-        }
+        state1 = State.valueOf(state);
         switch (state1) {
             case CURRENT:
                 return bookingRepository.findAllByBookerAndStartBeforeAndEndAfterOrderByStartAsc(user,
@@ -168,22 +161,17 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.findAllByStatusAndBookerOrderByStartDesc(State.WAITING, user, page);
             case ALL:
                 return bookingRepository.findAllByBookerOrderByStartDesc(user, page);
-            default:
-                throw new UnknownStateException("Unknown state: " + state);
+
         }
+        return List.of();
     }
 
-    private List<Booking> chooseRequestForOwner(List<Item> items, String state, Long from, Long size) throws UnknownStateException {
+    private List<Booking> chooseRequestForOwner(List<Item> items, String state, Long from, Long size) {
         State state1;
-        try {
-            state1 = State.valueOf(state);
-        } catch (IllegalArgumentException e) {
-            state1 = State.UNSUPPORTED_STATUS;
-        }
         int fromInt = Integer.parseInt(from.toString());
         int sizeInt = Integer.parseInt(size.toString());
         Pageable page = PageRequest.of(fromInt / sizeInt, sizeInt);
-
+        state1 = State.valueOf(state);
         switch (state1) {
             case CURRENT:
                 return bookingRepository.findAllByItemInAndStartBeforeAndEndAfterOrderByStartDesc(items,
@@ -200,9 +188,9 @@ public class BookingServiceImpl implements BookingService {
                 return bookingRepository.findAllByStatusAndItemInOrderByStartDesc(State.WAITING, items, page);
             case ALL:
                 return bookingRepository.findAllByItemInOrderByStartDesc(items, page);
-            default:
-                throw new UnknownStateException("Unknown state: " + state);
+
         }
+        return List.of();
     }
 
 }

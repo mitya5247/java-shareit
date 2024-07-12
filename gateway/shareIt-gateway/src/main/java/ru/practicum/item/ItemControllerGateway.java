@@ -59,7 +59,7 @@ public class ItemControllerGateway {
     @PostMapping(value = Constants.PATH_ITEM_ID + "/comment")
     public ResponseEntity<Object> addComment(@RequestHeader(Constants.HEADER) Long userId, @PathVariable Long itemId,
                                  @Valid @RequestBody Comment comment) {
-        String uri = baseUri + "/comment" + itemId;
+        String uri = baseUri + "/" + itemId + "/comment";
         return client.post(uri, userId, comment);
     }
 }

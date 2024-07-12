@@ -17,5 +17,7 @@ public class Constants {
 
     public static final String PATH_REQUEST_ID = "/{requestId}";
 
+    public static final String PATH_REQUESTS = "/requests";
+
 
 }

@@ -27,13 +27,6 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleDtoNotValid(final BookingDtoIsNotValidException exception) {
-        log.info(exception.getMessage());
-        return new ErrorResponse(exception.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public UnknownStateException handleItemNotFound(final UnknownStateException exception) {
         log.info(exception.getMessage());
         return exception;
