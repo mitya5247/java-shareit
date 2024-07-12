@@ -13,6 +13,8 @@ public class Constants {
 
     public static final String PATH_ITEMS = "/items";
 
+    public static final String PATH_BOOKINGS = "/bookings";
+
     public static final String PATH_REQUEST_ID = "/{requestId}";
 
 

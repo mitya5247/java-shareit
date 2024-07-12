@@ -33,8 +33,7 @@ public class BookingServiceImpl implements BookingService {
     UserRepository userRepository;
 
     @Override
-    public BookingDtoResponse createRequest(Long userId, BookingDto bookingDto) throws EntityNotFoundException, ItemIsUnAvailableException, BookingDtoIsNotValidException {
-            this.validateTimeBookingDto(bookingDto);
+    public BookingDtoResponse createRequest(Long userId, BookingDto bookingDto) throws EntityNotFoundException, ItemIsUnAvailableException {
         Booking booking = Mapper.convertToBooking(bookingDto);
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new javax.persistence.EntityNotFoundException("user with id " + userId + " was not found"));
@@ -137,19 +136,6 @@ public class BookingServiceImpl implements BookingService {
     private Booking bookingNotFound(Long bookingId) throws EntityNotFoundException {
         return bookingRepository.findById(bookingId).orElseThrow(() -> new EntityNotFoundException(
                 "booking with id " + bookingId + " was not found"));
-    }
-
-    private void validateTimeBookingDto(BookingDto bookingDto) throws BookingDtoIsNotValidException {
-        if (bookingDto.getStart() == null || bookingDto.getEnd() == null) {
-            throw new BookingDtoIsNotValidException("start and end time couldn't be null");
-        } else if (bookingDto.getStart().equals(bookingDto.getEnd())) {
-            throw new BookingDtoIsNotValidException("start couldn't be equals end");
-        } else if (bookingDto.getEnd().isBefore(LocalDateTime.now()) ||
-                bookingDto.getStart().isBefore(LocalDateTime.now())) {
-            throw new BookingDtoIsNotValidException("end and start time couldn't be in past");
-        } else if (bookingDto.getEnd().isBefore(bookingDto.getStart())) {
-            throw new BookingDtoIsNotValidException("end couldn't be earlier than start");
-        }
     }
 
 
