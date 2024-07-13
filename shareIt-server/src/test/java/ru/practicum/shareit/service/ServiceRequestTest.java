@@ -9,7 +9,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.*;
 import ru.practicum.shareit.exceptions.EntityNotFoundException;
-import ru.practicum.shareit.exceptions.NotEmptyDescriptionException;
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.request.service.RequestService;
@@ -48,7 +47,7 @@ public class ServiceRequestTest {
     }
 
     @Test
-    public void createRequestTest() throws EntityNotFoundException, NotEmptyDescriptionException {
+    public void createRequestTest() throws EntityNotFoundException {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
 
@@ -65,7 +64,7 @@ public class ServiceRequestTest {
     }
 
     @Test
-    public void createRequestWithoutItemsTest() throws EntityNotFoundException, NotEmptyDescriptionException {
+    public void createRequestWithoutItemsTest() throws EntityNotFoundException {
 
         request.setItems(null);
         Mockito.when(userRepository.findById(Mockito.anyLong()))
