@@ -409,19 +409,6 @@ public class ServiceBookingTests {
     }
 
     @Test
-    public void getStateUserBookingsWithNegativeFromTest() {
-        Mockito.when(userRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.ofNullable(user));
-        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.ofNullable(booking));
-        Mockito.when(itemRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.ofNullable(item));
-
-        Assertions.assertThrows(IllegalArgumentException.class, () ->  service.getAllUserBookings(user.getId(), null, -1L, 10L));
-
-    }
-
-    @Test
     public void getAllUserBookingsWithNegativeSizeTest() {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));
@@ -472,60 +459,6 @@ public class ServiceBookingTests {
         Assertions.assertThrows(EntityNotFoundException.class, () -> service.getAllItemsBooked(user.getId(), "ALL", 0L, 10L));
 
     }
-
-    @Test
-    public void getAllItemsBookedByNegativeFromTest() {
-        Mockito.when(userRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.ofNullable(user));
-        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.ofNullable(booking));
-        Mockito.when(itemRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.ofNullable(item));
-
-        List<Item> items = new ArrayList<>();
-
-        items.add(item);
-
-        Assertions.assertThrows(IllegalArgumentException.class, () -> service.getAllItemsBooked(user.getId(), "ALL", -1L, 10L));
-
-    }
-
-    @Test
-    public void getAllItemsBookedByNegativeSizeTest() {
-        Mockito.when(userRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.ofNullable(user));
-        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.ofNullable(booking));
-        Mockito.when(itemRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.ofNullable(item));
-
-        List<Item> items = new ArrayList<>();
-
-        items.add(item);
-
-        Assertions.assertThrows(IllegalArgumentException.class, () -> service.getAllItemsBooked(user.getId(), "ALL", 0L, -10L));
-
-    }
-
-//    @Test
-//    public void getAllItemsBookedByUnknownStateTest() {
-//        Mockito.when(userRepository.findById(Mockito.anyLong()))
-//                .thenReturn(Optional.ofNullable(user));
-//        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
-//                .thenReturn(Optional.ofNullable(booking));
-//        Mockito.when(itemRepository.findById(Mockito.anyLong()))
-//                .thenReturn(Optional.ofNullable(item));
-//
-//        List<Item> items = new ArrayList<>();
-//
-//        items.add(item);
-//
-//        Mockito.when(itemRepository.findAllByOwnerOrderById(Mockito.anyLong()))
-//                .thenReturn(items);
-//
-//        Assertions.assertThrows(UnknownStateException.class, () -> service.getAllItemsBooked(user.getId(), "bla", 0L, 10L));
-//
-//    }
 
     @Test
     public void getAllItemsBookedByNullStateTest() throws EntityNotFoundException {
@@ -689,17 +622,4 @@ public class ServiceBookingTests {
 
     }
 
-//    @Test
-//    public void getBookingByUnknownStateTest() {
-//        Mockito.when(userRepository.findById(Mockito.anyLong()))
-//                .thenReturn(Optional.ofNullable(user));
-//        Mockito.when(bookingRepository.findById(Mockito.anyLong()))
-//                .thenReturn(Optional.ofNullable(booking));
-//        Mockito.when(itemRepository.findById(Mockito.anyLong()))
-//                .thenReturn(Optional.ofNullable(item));
-//
-//        Assertions.assertThrows(UnknownStateException.class, () ->
-//                service.getAllUserBookings(user.getId(), "UNKNOWN", 0L, 10L));
-//
-//    }
 }

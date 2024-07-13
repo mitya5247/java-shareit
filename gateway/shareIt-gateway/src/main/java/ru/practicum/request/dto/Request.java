@@ -25,6 +25,5 @@ public class Request {
     @Positive(message = "requestor musn't be negative")
     Long requestor;
     List<ItemRequestDto> items;
-    @Column(name = "created")
     LocalDateTime created = LocalDateTime.now();
 }

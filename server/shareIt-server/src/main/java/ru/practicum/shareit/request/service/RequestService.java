@@ -1,14 +1,13 @@
 package ru.practicum.shareit.request.service;
 
 import ru.practicum.shareit.exceptions.EntityNotFoundException;
-import ru.practicum.shareit.exceptions.NotEmptyDescriptionException;
 import ru.practicum.shareit.request.model.Request;
 
 import java.util.List;
 
 public interface RequestService {
 
-    Request create(Long requestId, Request request) throws NotEmptyDescriptionException, EntityNotFoundException;
+    Request create(Long requestId, Request request) throws EntityNotFoundException;
 
     List<Request> getRequestOfUser(Long userId) throws EntityNotFoundException;
 

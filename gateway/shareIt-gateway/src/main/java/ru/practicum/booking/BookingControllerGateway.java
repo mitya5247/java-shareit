@@ -78,6 +78,7 @@ public class BookingControllerGateway {
 
     private String buildUri(String state, Long from, Long size) {
         String uri = "";
+        this.validateParams(from, size);
         if (state == null) {
             uri = baseUri + "/?from=" + from + "&size=" + size;
         } else {
@@ -88,6 +89,7 @@ public class BookingControllerGateway {
 
     private String buildUriOwner(String state, Long from, Long size) {
         String uri = "";
+        this.validateParams(from, size);
         if (state == null) {
             uri = baseUri + "/owner/?from=" + from + "&size=" + size;
         } else {
@@ -117,5 +119,14 @@ public class BookingControllerGateway {
             throw new UnknownStateException("Unknown state: " + state);
         }
         return state1;
+    }
+
+    private void validateParams(Long from, Long size) {
+        if (from < 0) {
+            throw new IllegalArgumentException("from couldn't be less 0 " + from);
+        }
+        if (size <= 0) {
+            throw new IllegalArgumentException("size couldn't be less 0 " + size);
+        }
     }
 }

@@ -8,8 +8,6 @@ import lombok.experimental.FieldDefaults;
 import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -22,8 +20,6 @@ public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    @NotBlank(message = "text must not be an empty")
-    @NotNull(message = "text must not be null")
     @Column(name = "text")
     String text;
     @ManyToOne

@@ -91,28 +91,6 @@ public class ServiceRequestTest {
     }
 
     @Test
-    public void createRequestithEmptyDescrUserTest() {
-
-        Mockito.when(userRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.ofNullable(user));
-
-        request.setDescription("");
-        Assertions.assertThrows(NotEmptyDescriptionException.class, () -> service.create(user.getId(), request));
-
-    }
-
-    @Test
-    public void createRequestithNullDescrUserTest() {
-
-        Mockito.when(userRepository.findById(Mockito.anyLong()))
-                .thenReturn(Optional.ofNullable(user));
-
-        request.setDescription(null);
-        Assertions.assertThrows(NotEmptyDescriptionException.class, () -> service.create(user.getId(), request));
-
-    }
-
-    @Test
     public void getRequestOfUserTest() throws EntityNotFoundException {
         Mockito.when(userRepository.findById(Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(user));

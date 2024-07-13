@@ -5,11 +5,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.Constants;
 import ru.practicum.shareit.exceptions.EntityNotFoundException;
-import ru.practicum.shareit.exceptions.NotEmptyDescriptionException;
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.service.RequestService;
 
-import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -24,7 +22,7 @@ public class ItemRequestController {
     RequestService service;
 
     @PostMapping
-    public Request create(@RequestHeader(Constants.HEADER) Long userId, @Valid @RequestBody Request request) throws EntityNotFoundException, NotEmptyDescriptionException {
+    public Request create(@RequestHeader(Constants.HEADER) Long userId, @RequestBody Request request) throws EntityNotFoundException {
         return service.create(userId, request);
     }
 

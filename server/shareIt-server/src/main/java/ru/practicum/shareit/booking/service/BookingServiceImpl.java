@@ -95,12 +95,6 @@ public class BookingServiceImpl implements BookingService {
         List<Booking> bookings;
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new EntityNotFoundException("user with id " + userId + " was not found"));
-        if (from < 0) {
-            throw new IllegalArgumentException("from couldn't be less 0 " + from);
-        }
-        if (size <= 0) {
-            throw new IllegalArgumentException("size couldn't be less 0 " + from);
-        }
         if (state == null) {
             state = String.valueOf(State.ALL);
         }
@@ -115,12 +109,6 @@ public class BookingServiceImpl implements BookingService {
         User user = userRepository.findById(userId).orElseThrow(() ->
                 new EntityNotFoundException("user with id " + userId + " was not found"));
         List<Booking> bookings = new ArrayList<>();
-        if (from < 0) {
-            throw new IllegalArgumentException("from couldn't be less 0 " + from);
-        }
-        if (size <= 0) {
-            throw new IllegalArgumentException("size couldn't be less 0 " + size);
-        }
         if (state == null) {
             state = String.valueOf(State.ALL);
         }

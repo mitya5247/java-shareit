@@ -18,6 +18,7 @@ import ru.practicum.Constants;
 import ru.practicum.booking.BookingClient;
 import ru.practicum.booking.BookingControllerGateway;
 import ru.practicum.booking.dto.BookingDto;
+import ru.practicum.booking.dto.State;
 import ru.practicum.item.dto.ItemDto;
 import ru.practicum.user.dto.User;
 
@@ -27,8 +28,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import static org.hamcrest.Matchers.is;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -65,7 +65,7 @@ public class BookingControllerGatewayTests {
         bookingDto.setId(1L);
         bookingDto.setBookerId(user.getId());
         bookingDto.setStart(LocalDateTime.now());
-        bookingDto.setEnd(LocalDateTime.now());
+        bookingDto.setEnd(LocalDateTime.now().plusSeconds(1));
         bookingDto.setItemId(itemDto.getId());
 
         mapper.registerModule(new JavaTimeModule());
@@ -236,4 +236,143 @@ public class BookingControllerGatewayTests {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    public void getBookingsTest() throws Exception {
+
+        bookingDto.setStart(LocalDateTime.now().plusHours(1));
+        bookingDto.setEnd(LocalDateTime.now().plusHours(2));
+
+        ResponseEntity<Object> response = new ResponseEntity<>(bookingDto, HttpStatus.OK);
+
+        Class<?> className = client.getClass();
+
+        Method get = className.getDeclaredMethod("get", String.class, long.class);
+
+        get.setAccessible(true);
+
+        Mockito.when(get.invoke(client, Mockito.anyString(), Mockito.anyLong()))
+                .thenReturn(response);
+
+        mvc.perform(get("/bookings")
+                        .header(Constants.HEADER, user.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(Integer.parseInt(String.valueOf(bookingDto.getId())))))
+                .andExpect(jsonPath("$.status", is(bookingDto.getStatus().toString())))
+                .andExpect(jsonPath("$.bookerId", is(Integer.parseInt(String.valueOf(bookingDto.getBookerId())))))
+                .andExpect(jsonPath("$.itemId", is(Integer.parseInt(String.valueOf(bookingDto.getItemId())))));
+    }
+
+    @Test
+    public void getBookingTest() throws Exception {
+
+        bookingDto.setStart(LocalDateTime.now().plusHours(1));
+        bookingDto.setEnd(LocalDateTime.now().plusHours(2));
+
+        ResponseEntity<Object> response = new ResponseEntity<>(bookingDto, HttpStatus.OK);
+
+        Class<?> className = client.getClass();
+
+        Method get = className.getDeclaredMethod("get", String.class, long.class);
+
+        get.setAccessible(true);
+
+        Mockito.when(get.invoke(client, Mockito.anyString(), Mockito.anyLong()))
+                .thenReturn(response);
+
+        mvc.perform(get("/bookings/1")
+                        .header(Constants.HEADER, user.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(Integer.parseInt(String.valueOf(bookingDto.getId())))))
+                .andExpect(jsonPath("$.status", is(bookingDto.getStatus().toString())))
+                .andExpect(jsonPath("$.bookerId", is(Integer.parseInt(String.valueOf(bookingDto.getBookerId())))))
+                .andExpect(jsonPath("$.itemId", is(Integer.parseInt(String.valueOf(bookingDto.getItemId())))));
+    }
+
+    @Test
+    public void getBookingsByOwnerTest() throws Exception {
+
+        bookingDto.setStart(LocalDateTime.now().plusHours(1));
+        bookingDto.setEnd(LocalDateTime.now().plusHours(2));
+
+        ResponseEntity<Object> response = new ResponseEntity<>(bookingDto, HttpStatus.OK);
+
+        Class<?> className = client.getClass();
+
+        Method get = className.getDeclaredMethod("get", String.class, long.class);
+
+        get.setAccessible(true);
+
+        Mockito.when(get.invoke(client, Mockito.anyString(), Mockito.anyLong()))
+                .thenReturn(response);
+
+        mvc.perform(get("/bookings/owner")
+                        .header(Constants.HEADER, user.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(Integer.parseInt(String.valueOf(bookingDto.getId())))))
+                .andExpect(jsonPath("$.status", is(bookingDto.getStatus().toString())))
+                .andExpect(jsonPath("$.bookerId", is(Integer.parseInt(String.valueOf(bookingDto.getBookerId())))))
+                .andExpect(jsonPath("$.itemId", is(Integer.parseInt(String.valueOf(bookingDto.getItemId())))));
+    }
+
+    @Test
+    public void updateBookingStateByOwnerTest() throws Exception {
+
+        bookingDto.setStart(LocalDateTime.now().plusHours(1));
+        bookingDto.setEnd(LocalDateTime.now().plusHours(2));
+        bookingDto.setStatus(State.APPROVED);
+
+        ResponseEntity<Object> response = new ResponseEntity<>(bookingDto, HttpStatus.OK);
+
+        Class<?> className = client.getClass();
+
+        Method patch = className.getDeclaredMethod("patch", String.class, long.class);
+
+        patch.setAccessible(true);
+
+        Mockito.when(patch.invoke(client, Mockito.anyString(), Mockito.anyLong()))
+                .thenReturn(response);
+
+        mvc.perform(patch("/bookings/1?approved=true")
+                        .header(Constants.HEADER, user.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(Integer.parseInt(String.valueOf(bookingDto.getId())))))
+                .andExpect(jsonPath("$.status", is(State.APPROVED.toString())))
+                .andExpect(jsonPath("$.bookerId", is(Integer.parseInt(String.valueOf(bookingDto.getBookerId())))))
+                .andExpect(jsonPath("$.itemId", is(Integer.parseInt(String.valueOf(bookingDto.getItemId())))));
+    }
+
+    @Test
+    public void updateBookingStateByBadStateTest() throws Exception {
+
+        bookingDto.setStart(LocalDateTime.now().plusHours(1));
+        bookingDto.setEnd(LocalDateTime.now().plusHours(2));
+        bookingDto.setStatus(State.APPROVED);
+
+        ResponseEntity<Object> response = new ResponseEntity<>(bookingDto, HttpStatus.OK);
+
+        Class<?> className = client.getClass();
+
+        Method patch = className.getDeclaredMethod("patch", String.class, long.class);
+
+        patch.setAccessible(true);
+
+        Mockito.when(patch.invoke(client, Mockito.anyString(), Mockito.anyLong()))
+                .thenReturn(response);
+
+        mvc.perform(patch("/bookings/1?approved=bla")
+                        .header(Constants.HEADER, user.getId())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
 }

@@ -12,7 +12,6 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.service.ItemService;
 
-import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -53,7 +52,7 @@ public class ItemController {
 
     @PostMapping(value = Constants.PATH_ITEM_ID + "/comment")
     public CommentDto addComment(@RequestHeader(Constants.HEADER) Long userId, @PathVariable Long itemId,
-                                 @Valid @RequestBody Comment comment) throws EntityNotFoundException, BadCommentException {
+                                 @RequestBody Comment comment) throws EntityNotFoundException, BadCommentException {
         return service.addComment(userId, itemId, comment);
     }
 }

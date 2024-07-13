@@ -30,6 +30,7 @@ public class ItemRequestControllerGateway {
     @PostMapping
     public ResponseEntity<Object> create(@RequestHeader(Constants.HEADER) Long userId, @Valid @RequestBody Request request)
             throws NotEmptyDescriptionException {
+        this.isEmptyDescription(request);
         return client.post(baseUri, userId, request);
     }
 
@@ -49,5 +50,11 @@ public class ItemRequestControllerGateway {
     public ResponseEntity<Object> getOneRequest(@RequestHeader(Constants.HEADER) Long userId, @PathVariable Long requestId) {
         String uri = baseUri + "/" + requestId;
         return client.get(uri, userId);
+    }
+
+    private void isEmptyDescription(Request request) throws NotEmptyDescriptionException {
+        if (request.getDescription().isBlank()) {
+            throw new NotEmptyDescriptionException("descriptiom mustn't be null");
+        }
     }
 }

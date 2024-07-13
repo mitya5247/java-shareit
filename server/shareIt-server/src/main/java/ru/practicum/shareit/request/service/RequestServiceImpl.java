@@ -9,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.EntityNotFoundException;
-import ru.practicum.shareit.exceptions.NotEmptyDescriptionException;
 
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.repository.RequestRepository;
@@ -30,9 +29,8 @@ public class RequestServiceImpl implements RequestService {
 
 
     @Override
-    public Request create(Long userId, Request request) throws NotEmptyDescriptionException, EntityNotFoundException {
+    public Request create(Long userId, Request request) throws EntityNotFoundException {
         User user = this.userNotFound(userId);
-        this.isEmptyDescription(request);
         request.setRequestor(userId);
         if (request.getItems() == null) {
             request.setItems(new ArrayList<>());
@@ -92,9 +90,4 @@ public class RequestServiceImpl implements RequestService {
         return request;
     }
 
-    private void isEmptyDescription(Request request) throws NotEmptyDescriptionException {
-        if (request.getDescription() == null || request.getDescription().isEmpty()) {
-            throw new NotEmptyDescriptionException("descriptiom mustn't be null");
-        }
-    }
 }

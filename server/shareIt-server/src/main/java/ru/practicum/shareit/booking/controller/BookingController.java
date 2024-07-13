@@ -26,7 +26,8 @@ public class BookingController {
     BookingService service;
 
     @PostMapping
-    public BookingDtoResponse createRequest(@RequestHeader(Constants.HEADER) Long userId, @RequestBody BookingDto bookingDto) throws EntityNotFoundException, ItemIsUnAvailableException {
+    public BookingDtoResponse createRequest(@RequestHeader(Constants.HEADER) Long userId,
+                                            @RequestBody BookingDto bookingDto) throws EntityNotFoundException, ItemIsUnAvailableException {
         return service.createRequest(userId, bookingDto);
     }
 
