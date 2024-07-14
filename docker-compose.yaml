@@ -17,7 +17,6 @@ services:
       - POSTGRES_DB=share
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
-      - TZ=Europe/Moscow
 
   share-server:
     container_name: share-server
@@ -35,7 +34,6 @@ services:
       - DB_HOST=db
       - DB_PORT=5432
       - SERVER_PORT=8081
-      - TZ=Europe/Moscow
 
 
   share-gateway:
@@ -48,6 +46,5 @@ services:
       - share-server
     environment:
           - HOST=share-server
-          - TZ=Europe/Moscow
 
 
