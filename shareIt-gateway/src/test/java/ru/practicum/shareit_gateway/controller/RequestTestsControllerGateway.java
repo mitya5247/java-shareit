@@ -21,7 +21,6 @@ import ru.practicum.user.dto.User;
 
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -54,7 +53,7 @@ public class RequestTestsControllerGateway {
         itemDto.setName("item");
         itemDto.setDescription("description");
         itemDto.setAvailable(true);
-        itemDto.setComments(new ArrayList<>());
+      //  itemDto.setComments(new ArrayList<>());
 
         request = new Request();
         request.setId(1L);

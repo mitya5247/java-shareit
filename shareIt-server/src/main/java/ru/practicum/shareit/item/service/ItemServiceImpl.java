@@ -110,7 +110,7 @@ public class ItemServiceImpl implements ItemService {
         if (booking == null) {
             throw new BadCommentException("couldn't give feedback as you didn't take item");
         }
-        if (booking.getStart().isAfter(now.plusSeconds(1))) {
+        if (booking.getStart().isAfter(now.plusSeconds(5))) {
             throw new BadCommentException("couldn't give feedback on the future booking");
         }
         if (booking.getStatus().equals(State.APPROVED)) {

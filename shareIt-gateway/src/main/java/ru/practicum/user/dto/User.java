@@ -18,10 +18,8 @@ import javax.validation.constraints.*;
 public class User {
     Long id;
     @Email
-    @NotBlank(message = "email must not be empty")
-    @NotNull(message = "email must not be null")
+    @NotBlank(message = "email must not be empty and null")
     String email;
-    @NotBlank(message = "name must not be empty")
-    @NotNull(message = "name must not be null")
+    @NotBlank(message = "name must not be empty and null")
     String name;
 }

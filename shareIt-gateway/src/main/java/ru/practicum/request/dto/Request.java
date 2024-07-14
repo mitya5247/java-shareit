@@ -7,7 +7,6 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,8 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 public class Request {
     Long id;
-    @NotBlank(message = "description musnt't be empty")
-    @NotNull(message = "description musnt't be null")
+    @NotBlank(message = "description musnt't be empty and null")
     String description;
     @Positive(message = "requestor musn't be negative")
     Long requestor;

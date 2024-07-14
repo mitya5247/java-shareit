@@ -8,7 +8,6 @@ import lombok.experimental.FieldDefaults;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Valid
@@ -18,8 +17,7 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Comment {
     Long id;
-    @NotBlank(message = "text must not be an empty")
-    @NotNull(message = "text must not be null")
+    @NotBlank(message = "text must not be an empty and null")
     String text;
     String authorName;
     LocalDateTime created;

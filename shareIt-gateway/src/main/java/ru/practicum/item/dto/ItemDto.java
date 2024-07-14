@@ -7,7 +7,6 @@ import ru.practicum.booking.dto.BookingDto;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 
 @Valid
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -17,16 +16,13 @@ import java.util.List;
 @EqualsAndHashCode
 public class ItemDto {
     Long id;
-    @NotBlank(message = "name must not be empty")
-    @NotNull(message = "name must not be null")
+    @NotBlank(message = "name must not be empty and null")
     String name;
-    @NotBlank(message = "description must not be empty")
-    @NotNull(message = "description must not be null")
+    @NotBlank(message = "description must not be empty and null")
     String description;
     @NotNull(message = "available must not be null")
     Boolean available;
     BookingDto lastBooking;
     BookingDto nextBooking;
-    List<CommentDto> comments;
     Long requestId;
 }

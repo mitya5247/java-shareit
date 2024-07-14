@@ -7,7 +7,6 @@ import lombok.Setter;
 
 
 import javax.validation.Valid;
-import javax.validation.constraints.FutureOrPresent;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
@@ -25,8 +24,6 @@ public class BookingDto {
     @NotNull(message = "itemId must not be null")
     Long itemId;
     State status = State.WAITING;
-    @FutureOrPresent(message = "start coudn't be in past")
     LocalDateTime start;
-    @FutureOrPresent(message = "end coudn't be in past")
     LocalDateTime end;
 }
